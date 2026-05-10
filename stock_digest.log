@@ -39,3 +39,93 @@
 2026-05-10 06:49:44,923 [INFO] ════════════════════════════════════════════════════════════════
 2026-05-10 06:49:44,923 [INFO] SELESAI — 2026-05-10 06:49 WIB
 2026-05-10 06:49:44,924 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:04:41,717 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:04:41,885 [INFO] STOCK DIGEST v2.1 MULAI — 2026-05-10 08:04 WIB
+2026-05-10 08:04:41,885 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:04:41,888 [INFO] ── Mengumpulkan berita RSS ──
+2026-05-10 08:04:53,996 [WARNING]   ⚠ Reuters: HTTPConnectionPool(host='feeds.reuters.com', port=80): Max retries exceeded with url: /reuters/businessNews (Caused by ConnectTimeoutError(<HTTPConnection(host='feeds.reuters.com', port=80) at 0x20d6bfbcd70>, 'Connection to feeds.reuters.com timed out. (connect timeout=12)'))
+2026-05-10 08:04:56,348 [INFO]   ✓ CNBC Markets: 15 berita
+2026-05-10 08:04:57,413 [INFO]   ✓ CNBC Top News: 15 berita
+2026-05-10 08:04:58,398 [INFO]   ✓ Yahoo Finance: 15 berita
+2026-05-10 08:05:01,134 [INFO]   ✓ MarketWatch: 10 berita
+2026-05-10 08:05:02,561 [INFO]   ✓ Investing.com: 10 berita
+2026-05-10 08:05:05,046 [INFO]   ✓ Motley Fool: 15 berita
+2026-05-10 08:05:06,048 [INFO]   ✓ Seeking Alpha: 7 berita
+2026-05-10 08:05:07,282 [INFO]   ✓ Benzinga: 10 berita
+2026-05-10 08:05:08,261 [WARNING]   ⚠ TheStreet: 403 Client Error: Forbidden for url: https://www.thestreet.com/rss/index.xml
+2026-05-10 08:05:20,835 [WARNING]   ⚠ Barrons: HTTPSConnectionPool(host='feeds.barrons.com', port=443): Max retries exceeded with url: /barrons/home (Caused by ConnectTimeoutError(<HTTPSConnection(host='feeds.barrons.com', port=443) at 0x20d6be9b610>, 'Connection to feeds.barrons.com timed out. (connect timeout=12)'))
+2026-05-10 08:05:21,394 [WARNING]   ⚠ AP Business: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/business (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-10 08:05:22,524 [WARNING]   ⚠ Kontan: HTTPSConnectionPool(host='rss.kontan.co.id', port=443): Max retries exceeded with url: /news/pasar-saham (Caused by SSLError(SSLError(1, '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1081)')))
+2026-05-10 08:05:23,673 [INFO]   ✓ CNBC Indonesia: 15 berita
+2026-05-10 08:05:24,519 [WARNING]   ⚠ Bisnis Indonesia: 403 Client Error: Forbidden for url: https://rss.bisnis.com/feed/articles/pasar-modal
+2026-05-10 08:05:24,838 [INFO] Total berita unik: 99 (US=84, ID=15)
+2026-05-10 08:05:24,838 [INFO] ── Menerjemahkan judul artikel (maks 40) ──
+2026-05-10 08:06:33,442 [INFO]   Terjemahan selesai: 40 judul
+2026-05-10 08:06:33,442 [INFO] ── Mengambil kalender ekonomi (ForexFactory) ──
+2026-05-10 08:06:36,802 [WARNING]   Kalender [ff_calendar_nextweek.json] gagal: 404 Client Error: Not Found for url: https://nfs.faireconomy.media/ff_calendar_nextweek.json
+2026-05-10 08:06:36,802 [INFO]   Hari ini (2026-05-10) hanya 0 event USD → coba 2026-05-11
+2026-05-10 08:06:36,803 [INFO]   Masih 0 event, tambahkan 2026-05-12
+2026-05-10 08:06:36,803 [INFO]   Kalender: 0 event USD | weekend_mode=False
+2026-05-10 08:06:36,803 [INFO] ── Menyiapkan analisis ──
+2026-05-10 08:06:36,815 [INFO]   Geopolitik total: 57 berita
+2026-05-10 08:06:36,815 [INFO]   Kalender:   0 event USD
+2026-05-10 08:06:36,815 [INFO]   Sentimen:   99 berita → Netral
+2026-05-10 08:06:36,816 [INFO]   Geopolitik: 57 berita
+2026-05-10 08:06:36,816 [INFO]   Rekomendasi: NETRAL — Pasar mixed. Tunggu katalis yang jelas; fokus pada ...
+2026-05-10 08:06:36,816 [INFO] ── Menyimpan data ──
+2026-05-10 08:06:36,817 [INFO]   Tersimpan: kalender.json
+2026-05-10 08:06:36,822 [INFO]   Tersimpan: sentimen.json
+2026-05-10 08:06:36,823 [INFO]   Tersimpan: geopolitik.json
+2026-05-10 08:06:36,825 [INFO]   JS data: stock_analysis_data.js
+2026-05-10 08:06:36,825 [INFO] ── Mengirim email ──
+2026-05-10 08:06:41,422 [INFO]   ✉ Terkirim: 📅 Kalender Ekonomi Saham AS — 2026-05-10
+2026-05-10 08:06:48,240 [INFO]   ✉ Terkirim: 📊 Analisis Sentimen Pasar Saham — 2026-05-10
+2026-05-10 08:06:55,107 [INFO]   ✉ Terkirim: 🌍 Geopolitik & Pasar Saham AS — 2026-05-10
+2026-05-10 08:06:55,109 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:06:55,110 [INFO] SELESAI — 2026-05-10 08:06 WIB
+2026-05-10 08:06:55,110 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:17:20,331 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:17:20,332 [INFO] STOCK DIGEST v2.1 MULAI — 2026-05-10 08:17 WIB
+2026-05-10 08:17:20,332 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:17:20,333 [INFO] ── Mengumpulkan berita RSS ──
+2026-05-10 08:17:32,443 [WARNING]   ⚠ Reuters: HTTPConnectionPool(host='feeds.reuters.com', port=80): Max retries exceeded with url: /reuters/businessNews (Caused by ConnectTimeoutError(<HTTPConnection(host='feeds.reuters.com', port=80) at 0x29b1c970ad0>, 'Connection to feeds.reuters.com timed out. (connect timeout=12)'))
+2026-05-10 08:17:33,991 [INFO]   ✓ CNBC Markets: 15 berita
+2026-05-10 08:17:35,213 [INFO]   ✓ CNBC Top News: 15 berita
+2026-05-10 08:17:35,639 [WARNING]   ⚠ Yahoo Finance: HTTPSConnectionPool(host='finance.yahoo.com', port=443): Max retries exceeded with url: /news/rssindex (Caused by NameResolutionError("HTTPSConnection(host='finance.yahoo.com', port=443): Failed to resolve 'finance.yahoo.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-10 08:17:37,980 [INFO]   ✓ MarketWatch: 10 berita
+2026-05-10 08:17:38,989 [INFO]   ✓ Investing.com: 10 berita
+2026-05-10 08:17:41,487 [INFO]   ✓ Motley Fool: 15 berita
+2026-05-10 08:17:42,502 [INFO]   ✓ Seeking Alpha: 7 berita
+2026-05-10 08:17:43,775 [INFO]   ✓ Benzinga: 10 berita
+2026-05-10 08:17:44,929 [WARNING]   ⚠ TheStreet: 403 Client Error: Forbidden for url: https://www.thestreet.com/rss/index.xml
+2026-05-10 08:17:57,395 [WARNING]   ⚠ Barrons: HTTPSConnectionPool(host='feeds.barrons.com', port=443): Max retries exceeded with url: /barrons/home (Caused by ConnectTimeoutError(<HTTPSConnection(host='feeds.barrons.com', port=443) at 0x29b1c9ca850>, 'Connection to feeds.barrons.com timed out. (connect timeout=12)'))
+2026-05-10 08:17:57,888 [WARNING]   ⚠ AP Business: HTTPSConnectionPool(host='feeds.apnews.com', port=443): Max retries exceeded with url: /rss/business (Caused by NameResolutionError("HTTPSConnection(host='feeds.apnews.com', port=443): Failed to resolve 'feeds.apnews.com' ([Errno 11001] getaddrinfo failed)"))
+2026-05-10 08:17:58,842 [WARNING]   ⚠ Kontan: HTTPSConnectionPool(host='rss.kontan.co.id', port=443): Max retries exceeded with url: /news/pasar-saham (Caused by SSLError(SSLError(1, '[SSL: SSLV3_ALERT_HANDSHAKE_FAILURE] sslv3 alert handshake failure (_ssl.c:1081)')))
+2026-05-10 08:17:59,995 [INFO]   ✓ CNBC Indonesia: 15 berita
+2026-05-10 08:18:00,975 [WARNING]   ⚠ Bisnis Indonesia: 403 Client Error: Forbidden for url: https://rss.bisnis.com/feed/articles/pasar-modal
+2026-05-10 08:18:01,279 [INFO] Total berita unik: 87 (US=72, ID=15)
+2026-05-10 08:18:01,280 [INFO] ── Menerjemahkan judul artikel (maks 40) ──
+2026-05-10 08:19:04,182 [INFO]   Terjemahan selesai: 40 judul
+2026-05-10 08:19:04,183 [INFO] -- Mengambil kalender ekonomi (ForexFactory / investing.com) --
+2026-05-10 08:19:05,794 [WARNING]   Kalender [ff_calendar_nextweek.json] gagal: 404 Client Error: Not Found for url: https://nfs.faireconomy.media/ff_calendar_nextweek.json
+2026-05-10 08:19:05,811 [INFO]   Data kalender tersedia untuk: ['2026-05-04', '2026-05-05', '2026-05-06', '2026-05-07', '2026-05-08']
+2026-05-10 08:19:05,813 [INFO]   Data mendatang belum tersedia, pakai minggu lalu (2026-05-08)
+2026-05-10 08:19:05,816 [INFO]   Kalender: 15 event USD | weekend_mode=True
+2026-05-10 08:19:05,816 [INFO] -- Menyiapkan analisis --
+2026-05-10 08:19:05,826 [INFO]   Geopolitik total: 48 berita
+2026-05-10 08:19:05,827 [INFO]   Kalender:   15 event USD
+2026-05-10 08:19:05,827 [INFO]   Sentimen:   87 berita → Netral
+2026-05-10 08:19:05,827 [INFO]   Geopolitik: 48 berita
+2026-05-10 08:19:05,827 [INFO]   Rekomendasi: NETRAL — Pasar mixed. Tunggu katalis yang jelas; fokus pada ...
+2026-05-10 08:19:05,827 [INFO] ── Menyimpan data ──
+2026-05-10 08:19:05,832 [INFO]   Tersimpan: kalender.json
+2026-05-10 08:19:05,835 [INFO]   Tersimpan: sentimen.json
+2026-05-10 08:19:05,836 [INFO]   Tersimpan: geopolitik.json
+2026-05-10 08:19:05,841 [INFO]   JS data: stock_analysis_data.js
+2026-05-10 08:19:05,841 [INFO] ── Mengirim email ──
+2026-05-10 08:19:10,373 [INFO]   ✉ Terkirim: 📅 Kalender Ekonomi Saham AS — 2026-05-10
+2026-05-10 08:19:17,584 [INFO]   ✉ Terkirim: 📊 Analisis Sentimen Pasar Saham — 2026-05-10
+2026-05-10 08:19:23,935 [INFO]   ✉ Terkirim: 🌍 Geopolitik & Pasar Saham AS — 2026-05-10
+2026-05-10 08:19:23,935 [INFO] ════════════════════════════════════════════════════════════════
+2026-05-10 08:19:23,935 [INFO] SELESAI — 2026-05-10 08:19 WIB
+2026-05-10 08:19:23,935 [INFO] ════════════════════════════════════════════════════════════════

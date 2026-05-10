@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-stock_news_digest.py — Analisis Saham Otomatis
+stock_news_digest.py v2.1 — Analisis Saham Otomatis
 Mengumpulkan berita saham, analisis sentimen, dan mengirim 3 email harian jam 07:00 WIB.
 
 Penggunaan:
@@ -8,17 +8,16 @@ Penggunaan:
   python stock_news_digest.py               # Mode daemon — tunggu jam 07:00 WIB setiap hari
   python stock_news_digest.py --setup       # Buat ulang config_email.ini
 
-Setup Windows Task Scheduler (alternatif daemon):
-  1. Buka Task Scheduler → Create Basic Task
-  2. Trigger: Daily, 07:00 (WIB = UTC+7, sesuaikan zona waktu sistem)
-  3. Action: Start a program
-     Program: python.exe
-     Arguments: "C:\\PATH\\TO\\stock_news_digest.py" --run-now
-     Start in: C:\\PATH\\TO\\files stock\\
+Pembaruan v2.1:
+  - Kalender: 2 sumber (minggu ini + depan) + fallback hari kerja saat weekend, min 10 event
+  - Sentimen: threshold ±1, rekomendasi_pasar, analisis indeks diperluas, min 30 berita
+  - Geopolitik: keyword diperluas ke pasar AS, fallback US market news, min 30 berita
+  - Terjemahan: judul artikel ke Bahasa Indonesia via MyMemory API (gratis)
+  - Lebih banyak berita: max 15 per feed (sebelumnya 8), 12 feed US
 """
 
 import os, sys, re, json, time, logging, configparser, smtplib
-from datetime import datetime
+from datetime import datetime, date as _date, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from html import unescape
@@ -26,28 +25,26 @@ from html import unescape
 try:
     from zoneinfo import ZoneInfo
 except ImportError:
-    # Python < 3.9 fallback
     import pytz
     class ZoneInfo:
         def __init__(self, key): self._tz = pytz.timezone(key)
-        def __call__(self): return self._tz
     _orig = ZoneInfo
     ZoneInfo = lambda k: _orig(k)._tz
 
 try:
     import feedparser
 except ImportError:
-    sys.exit("ERROR: Jalankan dulu: pip install -r requirements.txt")
+    sys.exit("ERROR: Jalankan dulu: pip install feedparser requests schedule beautifulsoup4")
 
 try:
     import requests
 except ImportError:
-    sys.exit("ERROR: Jalankan dulu: pip install -r requirements.txt")
+    sys.exit("ERROR: Jalankan dulu: pip install feedparser requests schedule beautifulsoup4")
 
 try:
     import schedule
 except ImportError:
-    sys.exit("ERROR: Jalankan dulu: pip install -r requirements.txt")
+    sys.exit("ERROR: Jalankan dulu: pip install feedparser requests schedule beautifulsoup4")
 
 try:
     from bs4 import BeautifulSoup
@@ -56,17 +53,27 @@ except ImportError:
     HAS_BS4 = False
 
 # ─── PATHS ────────────────────────────────────────────────────────────────────
-BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-CONFIG_FILE   = os.path.join(BASE_DIR, 'config_email.ini')
-KALENDER_FILE = os.path.join(BASE_DIR, 'kalender.json')
-SENTIMEN_FILE = os.path.join(BASE_DIR, 'sentimen.json')
+BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE     = os.path.join(BASE_DIR, 'config_email.ini')
+KALENDER_FILE   = os.path.join(BASE_DIR, 'kalender.json')
+SENTIMEN_FILE   = os.path.join(BASE_DIR, 'sentimen.json')
 GEOPOLITIK_FILE = os.path.join(BASE_DIR, 'geopolitik.json')
-DATA_JS_FILE  = os.path.join(BASE_DIR, 'stock_analysis_data.js')
-LOG_FILE      = os.path.join(BASE_DIR, 'stock_digest.log')
+DATA_JS_FILE    = os.path.join(BASE_DIR, 'stock_analysis_data.js')
+LOG_FILE        = os.path.join(BASE_DIR, 'stock_digest.log')
 
 WIB = ZoneInfo('Asia/Jakarta')
 
+# Nonaktifkan jika tidak mau panggil API terjemahan (lebih cepat)
+TRANSLATE_ENABLED = True
+
 # ─── LOGGING ──────────────────────────────────────────────────────────────────
+# Fix encoding Windows console (cp1252 tidak support emoji/Unicode)
+if sys.stdout.encoding and sys.stdout.encoding.lower() not in ('utf-8', 'utf8'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
@@ -77,24 +84,26 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-# ─── RSS FEEDS (80% US, 20% Indonesia) ───────────────────────────────────────
+# ─── RSS FEEDS ────────────────────────────────────────────────────────────────
 FEEDS_US = [
-    {'nama': 'Reuters',         'url': 'http://feeds.reuters.com/reuters/businessNews',                           'asal': 'US'},
-    {'nama': 'CNBC Markets',    'url': 'https://www.cnbc.com/id/100003114/device/rss/rss.html',                   'asal': 'US'},
-    {'nama': 'Yahoo Finance',   'url': 'https://finance.yahoo.com/news/rssindex',                                 'asal': 'US'},
-    {'nama': 'MarketWatch',     'url': 'https://feeds.marketwatch.com/marketwatch/topstories/',                   'asal': 'US'},
-    {'nama': 'Investing.com',   'url': 'https://www.investing.com/rss/news_25.rss',                               'asal': 'US'},
-    {'nama': 'Motley Fool',     'url': 'https://www.fool.com/feeds/index.aspx',                                   'asal': 'US'},
-    {'nama': 'Seeking Alpha',   'url': 'https://seekingalpha.com/market_currents.xml',                            'asal': 'US'},
-    {'nama': 'Benzinga',        'url': 'https://www.benzinga.com/feed',                                           'asal': 'US'},
-    {'nama': 'TheStreet',       'url': 'https://www.thestreet.com/rss/index.xml',                                 'asal': 'US'},
-    {'nama': 'Barrons',         'url': 'https://feeds.barrons.com/barrons/home',                                  'asal': 'US'},
+    {'nama': 'Reuters',        'url': 'http://feeds.reuters.com/reuters/businessNews',         'asal': 'US'},
+    {'nama': 'CNBC Markets',   'url': 'https://www.cnbc.com/id/100003114/device/rss/rss.html', 'asal': 'US'},
+    {'nama': 'CNBC Top News',  'url': 'https://www.cnbc.com/id/100727362/device/rss/rss.html', 'asal': 'US'},
+    {'nama': 'Yahoo Finance',  'url': 'https://finance.yahoo.com/news/rssindex',               'asal': 'US'},
+    {'nama': 'MarketWatch',    'url': 'https://feeds.marketwatch.com/marketwatch/topstories/', 'asal': 'US'},
+    {'nama': 'Investing.com',  'url': 'https://www.investing.com/rss/news_25.rss',             'asal': 'US'},
+    {'nama': 'Motley Fool',    'url': 'https://www.fool.com/feeds/index.aspx',                 'asal': 'US'},
+    {'nama': 'Seeking Alpha',  'url': 'https://seekingalpha.com/market_currents.xml',          'asal': 'US'},
+    {'nama': 'Benzinga',       'url': 'https://www.benzinga.com/feed',                         'asal': 'US'},
+    {'nama': 'TheStreet',      'url': 'https://www.thestreet.com/rss/index.xml',               'asal': 'US'},
+    {'nama': 'Barrons',        'url': 'https://feeds.barrons.com/barrons/home',                'asal': 'US'},
+    {'nama': 'AP Business',    'url': 'https://feeds.apnews.com/rss/business',                 'asal': 'US'},
 ]
 
 FEEDS_ID = [
-    {'nama': 'Kontan',          'url': 'https://rss.kontan.co.id/news/pasar-saham',                               'asal': 'ID'},
-    {'nama': 'CNBC Indonesia',  'url': 'https://www.cnbcindonesia.com/market/rss',                                'asal': 'ID'},
-    {'nama': 'Bisnis Indonesia', 'url': 'https://rss.bisnis.com/feed/articles/pasar-modal',                      'asal': 'ID'},
+    {'nama': 'Kontan',           'url': 'https://rss.kontan.co.id/news/pasar-saham',       'asal': 'ID'},
+    {'nama': 'CNBC Indonesia',   'url': 'https://www.cnbcindonesia.com/market/rss',         'asal': 'ID'},
+    {'nama': 'Bisnis Indonesia', 'url': 'https://rss.bisnis.com/feed/articles/pasar-modal', 'asal': 'ID'},
 ]
 
 # ─── KEYWORD LISTS ────────────────────────────────────────────────────────────
@@ -103,8 +112,11 @@ BULLISH_WORDS = [
     'outperform', 'beat', 'record high', 'upgrade', 'buy rating', 'strong',
     'growth', 'profit', 'recovery', 'rebound', 'positive', 'optimism',
     'exceeded', 'revenue beat', 'better than expected', 'all-time high',
-    'record', 'boom', 'expansion', 'accelerat', 'breakout', 'naik',
-    'menguat', 'reli', 'positif', 'tumbuh',
+    'record', 'boom', 'expansion', 'accelerat', 'breakout', 'skyrocket',
+    'top gainer', 'outperforms', 'buy signal', 'bullish', 'uptrend',
+    'strong earnings', 'beat expectations', 'profit surge',
+    'naik', 'menguat', 'reli', 'positif', 'tumbuh', 'meningkat',
+    'melonjak', 'bertumbuh', 'untung', 'berhasil', 'rekor',
 ]
 
 BEARISH_WORDS = [
@@ -113,52 +125,206 @@ BEARISH_WORDS = [
     'contraction', 'layoff', 'bankrupt', 'concern', 'risk', 'worry',
     'warning', 'weak', 'loss', 'deficit', 'inflation fears', 'rate hike',
     'slowdown', 'shrink', 'contract', 'tumble', 'slide', 'slump',
+    'miss expectations', 'earnings miss', 'profit warning', 'bearish',
+    'downtrend', 'breakdown', 'sell signal', 'underperform', 'cut forecast',
+    'guidance cut', 'revenue miss', 'job cuts', 'layoffs', 'bankruptcy',
     'turun', 'melemah', 'jatuh', 'rugi', 'koreksi', 'tekanan',
+    'merosot', 'anjlok', 'tertekan', 'kerugian', 'terpuruk',
 ]
 
 GEO_KEYWORDS = [
+    # Geopolitik tradisional
     'war', 'conflict', 'military', 'sanction', 'tariff', 'trade war',
     'geopolit', 'china', 'russia', 'ukraine', 'iran', 'north korea',
-    'middle east', 'nato', 'brics', 'election', 'political crisis',
-    'opec', 'oil supply', 'energy crisis', 'coup', 'taiwan',
+    'middle east', 'nato', 'brics', 'election', 'political',
+    'opec', 'oil', 'energy', 'coup', 'taiwan',
     'south china sea', 'nuclear', 'missile', 'embargo', 'invasion',
     'ceasefire', 'trump tariff', 'trade deal', 'import duty', 'export ban',
+    # Politik & kebijakan AS
+    'trump', 'white house', 'congress', 'senate', 'federal reserve',
+    'fed', 'rate hike', 'rate cut', 'interest rate', 'fomc',
+    'inflation', 'recession', 'gdp', 'jobs report', 'unemployment',
+    'debt ceiling', 'government', 'budget', 'deficit',
+    'supply chain', 'semiconductor', 'chip', 'rare earth', 'export control',
+    # Pasar saham AS
+    'wall street', 's&p', 'nasdaq', 'dow', 'stock market', 'stock',
+    'market rally', 'market crash', 'bear market', 'bull market',
+    'earnings', 'ipo', 'merger', 'acquisition', 'buyout',
+    'hedge fund', 'short', 'volatility', 'vix', 'options',
+    # Indonesia
     'geopolitik', 'perang', 'konflik', 'sanksi', 'pemilu', 'krisis',
-    'blokade', 'invasi', 'serangan', 'militer',
+    'blokade', 'invasi', 'serangan', 'militer', 'saham', 'pasar modal',
+    'bank sentral', 'suku bunga', 'inflasi', 'resesi',
 ]
 
 KNOWN_TICKERS = {
     'AAPL','MSFT','GOOGL','GOOG','AMZN','META','NVDA','TSLA','NFLX',
     'UBER','LYFT','INTC','AMD','QCOM','ORCL','CRM','ADBE','PYPL','SQ',
     'V','MA','JPM','GS','BAC','C','WFC','XOM','CVX','SPY','QQQ','DIA',
-    'SHOP','SNAP','TWTR','ABNB','COIN','HOOD','PLTR','ARM','SMCI','DELL',
+    'SHOP','SNAP','ABNB','COIN','HOOD','PLTR','ARM','SMCI','DELL',
     'IBM','HPQ','CSCO','AMAT','LRCX','KLAC','MU','WDC','STX','AVGO',
-    'TXN','ADI','MCHP','SWKS','QRVO','MPWR','ENTG','ONTO','COHU',
+    'TXN','ADI','MCHP','SWKS','MPWR','ENTG','ONTO',
     'AMGN','BIIB','GILD','MRNA','PFE','JNJ','UNH','CVS','WBA','MCK',
-    'DIS','CMCSA','T','VZ','TMUS','CHTR','NFLX','PARA','WBD','FOX',
-    'F','GM','TSLA','RIVN','LCID','NIO','LI','XPEV',
+    'DIS','CMCSA','T','VZ','TMUS','CHTR','PARA','WBD','FOX',
+    'F','GM','RIVN','LCID','NIO','LI','XPEV',
+    'BRK','WMT','TGT','COST','HD','LOW','SBUX','MCD','NKE','PG',
+    'KO','PEP','PM','MO','BABA','JD','PDD','TSM',
 }
 
 TICKER_RE = re.compile(r'\b([A-Z]{2,5})\b')
 
 GEO_KATEGORI_MAP = [
-    (['tariff', 'trade war', 'import duty', 'export ban', 'trade deal'], 'Tarif/Perdagangan'),
-    (['sanction', 'embargo', 'sanksi', 'blokade'],                        'Sanksi'),
+    (['tariff', 'trade war', 'import duty', 'export ban', 'trade deal'],  'Tarif/Perdagangan'),
+    (['sanction', 'embargo', 'sanksi', 'blokade'],                         'Sanksi'),
     (['war', 'invasion', 'conflict', 'military', 'missile', 'nuclear',
-      'perang', 'invasi', 'militer', 'serangan'],                         'Konflik Militer'),
-    (['election', 'political', 'coup', 'pemilu', 'krisis politik'],       'Politik'),
-    (['opec', 'oil supply', 'energy crisis', 'minyak', 'energi'],         'Energi/OPEC'),
-    (['china', 'taiwan', 'south china sea'],                               'China/Taiwan'),
-    (['russia', 'ukraine', 'rusia', 'ukraina'],                            'Rusia/Ukraina'),
-    (['iran', 'north korea', 'middle east'],                               'Timur Tengah'),
-    (['nato', 'brics'],                                                    'Aliansi Global'),
+      'perang', 'invasi', 'militer', 'serangan'],                          'Konflik Militer'),
+    (['election', 'political', 'coup', 'pemilu'],                          'Politik'),
+    (['opec', 'oil', 'energy', 'minyak', 'energi'],                        'Energi/OPEC'),
+    (['china', 'taiwan', 'south china sea'],                                'China/Taiwan'),
+    (['russia', 'ukraine', 'rusia', 'ukraina'],                             'Rusia/Ukraina'),
+    (['iran', 'north korea', 'middle east'],                                'Timur Tengah'),
+    (['nato', 'brics'],                                                     'Aliansi Global'),
+    (['federal reserve', 'fed', 'fomc', 'rate', 'inflation'],              'Kebijakan Moneter'),
+    (['s&p', 'nasdaq', 'dow', 'wall street', 'stock market'],              'Pasar Saham AS'),
+    (['earnings', 'ipo', 'merger', 'acquisition'],                         'Aksi Korporasi'),
+    (['semiconductor', 'chip', 'supply chain'],                            'Teknologi/Rantai Pasok'),
 ]
 
-DAMPAK_MAP = {'High': 'Tinggi', 'Medium': 'Sedang', 'Low': 'Rendah',
-              '3': 'Tinggi', '2': 'Sedang', '1': 'Rendah'}
+DAMPAK_MAP = {
+    'High': 'Tinggi', 'Medium': 'Sedang', 'Low': 'Rendah',
+    '3': 'Tinggi', '2': 'Sedang', '1': 'Rendah',
+}
+
+# ─── KAMUS NAMA EVENT EKONOMI (Bahasa Indonesia) ─────────────────────────────
+EVENT_NAMES_ID = {
+    'non-farm payroll':          'Penggajian Non-Pertanian (NFP)',
+    'nfp':                       'Penggajian Non-Pertanian (NFP)',
+    'initial jobless claims':    'Klaim Pengangguran Awal',
+    'continuing jobless claims': 'Klaim Pengangguran Berlanjut',
+    'jobless claims':            'Klaim Pengangguran',
+    'unemployment rate':         'Tingkat Pengangguran',
+    'cpi':                       'Indeks Harga Konsumen (CPI)',
+    'consumer price index':      'Indeks Harga Konsumen (CPI)',
+    'core cpi':                  'CPI Inti (Tanpa Energi & Pangan)',
+    'ppi':                       'Indeks Harga Produsen (PPI)',
+    'producer price index':      'Indeks Harga Produsen (PPI)',
+    'fomc':                      'Keputusan FOMC — Kebijakan Moneter Fed',
+    'federal open market':       'Keputusan FOMC — Kebijakan Moneter Fed',
+    'interest rate decision':    'Keputusan Suku Bunga Federal Reserve',
+    'fed rate':                  'Suku Bunga Federal Reserve',
+    'gdp':                       'Produk Domestik Bruto (PDB)',
+    'retail sales':              'Penjualan Ritel',
+    'pmi':                       'Indeks Manajer Pembelian (PMI)',
+    'ism manufacturing':         'ISM Manufaktur',
+    'ism services':              'ISM Jasa/Non-Manufaktur',
+    'ism non-manufacturing':     'ISM Non-Manufaktur',
+    'housing starts':            'Pembangunan Rumah Baru',
+    'building permits':          'Izin Bangunan Baru',
+    'existing home sales':       'Penjualan Rumah Bekas',
+    'new home sales':            'Penjualan Rumah Baru',
+    'pending home sales':        'Kontrak Rumah Tertunda',
+    'trade balance':             'Neraca Perdagangan AS',
+    'consumer confidence':       'Indeks Kepercayaan Konsumen',
+    'consumer sentiment':        'Sentimen Konsumen Michigan',
+    'durable goods':             'Pesanan Barang Tahan Lama',
+    'factory orders':            'Pesanan Pabrik',
+    'industrial production':     'Produksi Industri',
+    'capacity utilization':      'Kapasitas Utilisasi',
+    'empire state':              'Indeks Manufaktur Empire State',
+    'philly fed':                'Indeks Fed Philadelphia',
+    'beige book':                'Buku Beige Federal Reserve',
+    'crude oil inventories':     'Stok Minyak Mentah AS (EIA)',
+    'natural gas storage':       'Penyimpanan Gas Alam',
+    'current account':           'Neraca Berjalan',
+    'average hourly earnings':   'Rata-rata Upah Per Jam',
+    'participation rate':        'Tingkat Partisipasi Tenaga Kerja',
+    'jolts':                     'Data Lowongan Kerja (JOLTS)',
+    'job openings':              'Lowongan Kerja (JOLTS)',
+    'adp non-farm':              'Penggajian Non-Pertanian ADP',
+    'adp employment':            'Data Ketenagakerjaan ADP',
+    'personal income':           'Pendapatan Pribadi',
+    'personal spending':         'Pengeluaran Pribadi',
+    'pce price index':           'Indeks Harga PCE (Inflasi Favorit Fed)',
+    'core pce':                  'PCE Inti (Inflasi Inti Fed)',
+    'treasury':                  'Lelang Obligasi Treasury AS',
+    '10-year':                   'Lelang Treasury 10 Tahun',
+    '30-year':                   'Lelang Treasury 30 Tahun',
+    'powell':                    'Pidato Ketua Fed Powell',
+    'fed chair':                 'Pidato Ketua Federal Reserve',
+    'fed speak':                 'Pidato Pejabat Federal Reserve',
+    'flash pmi':                 'PMI Kilat (Estimasi Awal)',
+    'chicago pmi':               'PMI Chicago',
+    'richmond fed':              'Indeks Manufaktur Richmond Fed',
+    'dallas fed':                'Indeks Manufaktur Dallas Fed',
+    'kansas city fed':           'Indeks Manufaktur Kansas City Fed',
+    'export prices':             'Indeks Harga Ekspor',
+    'import prices':             'Indeks Harga Impor',
+    'wholesale inventories':     'Inventori Pedagang Grosir',
+    'business inventories':      'Inventori Bisnis',
+    'leading indicators':        'Indeks Leading Ekonomi',
+}
+
+def translate_event_name(title):
+    """Terjemahkan nama event ekonomi menggunakan kamus statis."""
+    t = title.lower()
+    for en, id_name in EVENT_NAMES_ID.items():
+        if en in t:
+            return id_name
+    return title
+
+# ─── TERJEMAHAN OTOMATIS (MyMemory API, gratis 5000 kata/hari) ───────────────
+_TRANS_CACHE: dict = {}
+
+def translate_to_id(text: str, timeout: int = 6) -> str:
+    """Terjemahkan teks Inggris ke Bahasa Indonesia via MyMemory API."""
+    if not text or len(text.strip()) < 5:
+        return text
+    key = text[:120]
+    if key in _TRANS_CACHE:
+        return _TRANS_CACHE[key]
+    try:
+        r = requests.get(
+            'https://api.mymemory.translated.net/get',
+            params={'q': text[:450], 'langpair': 'en|id'},
+            timeout=timeout,
+            headers={'User-Agent': 'StockDigest/2.1'},
+        )
+        data = r.json()
+        result = data.get('responseData', {}).get('translatedText', '')
+        bad = ('MYMEMORY WARNING', 'PLEASE SELECT', 'QUOTA EXPIRED')
+        if result and len(result) > 3 and result.upper() != text.upper() and not any(b in result.upper() for b in bad):
+            _TRANS_CACHE[key] = result
+            return result
+    except Exception:
+        pass
+    _TRANS_CACHE[key] = text
+    return text
+
+def translate_articles(articles: list, max_count: int = 40) -> list:
+    """Tambahkan field judul_id (terjemahan Indonesia) ke setiap artikel."""
+    if not TRANSLATE_ENABLED:
+        for a in articles:
+            a['judul_id'] = a.get('judul', '')
+        return articles
+
+    log.info(f'── Menerjemahkan judul artikel (maks {max_count}) ──')
+    count = 0
+    for a in articles:
+        judul = a.get('judul', '')
+        if count < max_count and a.get('asal') == 'US' and judul:
+            a['judul_id'] = translate_to_id(judul)
+            count += 1
+            time.sleep(0.25)
+        else:
+            a['judul_id'] = judul
+    # Isi yang belum diterjemahkan
+    for a in articles:
+        if 'judul_id' not in a:
+            a['judul_id'] = a.get('judul', '')
+    log.info(f'  Terjemahan selesai: {count} judul')
+    return articles
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
-
 def clean_html(raw):
     if not raw:
         return ''
@@ -183,21 +349,27 @@ def today_str():
 
 def hari_label():
     dt = now_wib()
-    hari = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']
+    hari  = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']
     bulan = ['','Januari','Februari','Maret','April','Mei','Juni',
              'Juli','Agustus','September','Oktober','November','Desember']
     return f"{hari[dt.weekday()]}, {dt.day} {bulan[dt.month]} {dt.year}"
 
-# ─── CONFIG ───────────────────────────────────────────────────────────────────
+def _next_business_day(date_str: str) -> str:
+    """Kembalikan tanggal hari kerja (Sen-Jum) berikutnya setelah date_str."""
+    d = _date.fromisoformat(date_str) + timedelta(days=1)
+    while d.weekday() >= 5:
+        d += timedelta(days=1)
+    return d.isoformat()
 
+# ─── CONFIG ───────────────────────────────────────────────────────────────────
 def create_default_config():
     c = configparser.ConfigParser()
     c['email'] = {
-        'sender':     'your_email@gmail.com',
-        'password':   'xxxx xxxx xxxx xxxx',
-        'recipient':  'v3662432@gmail.com',
-        'smtp_host':  'smtp.gmail.com',
-        'smtp_port':  '587',
+        'sender':    'your_email@gmail.com',
+        'password':  'xxxx xxxx xxxx xxxx',
+        'recipient': 'v3662432@gmail.com',
+        'smtp_host': 'smtp.gmail.com',
+        'smtp_port': '587',
     }
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         c.write(f)
@@ -227,10 +399,9 @@ def load_config():
         return None
 
 # ─── RSS FETCHING ─────────────────────────────────────────────────────────────
+HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) StockDigest/2.1 (+RSS)'}
 
-HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) StockDigest/2.0 (+RSS)'}
-
-def fetch_feed(source, timeout=12, max_per_feed=8):
+def fetch_feed(source, timeout=12, max_per_feed=15):
     articles = []
     try:
         resp = requests.get(source['url'], headers=HEADERS, timeout=timeout)
@@ -273,33 +444,28 @@ def fetch_all_news():
     for s in FEEDS_US:
         us_arts.extend(fetch_feed(s))
         time.sleep(0.4)
-
     for s in FEEDS_ID:
         id_arts.extend(fetch_feed(s))
         time.sleep(0.3)
 
-    # Enforce 80/20 split — target ≥30 total
     us_dedup = dedup(us_arts)
     id_dedup = dedup(id_arts)
 
-    total_target = max(30, len(us_dedup) + len(id_dedup))
+    total_target = max(50, len(us_dedup) + len(id_dedup))
     us_quota = int(total_target * 0.8)
     id_quota = total_target - us_quota
 
-    combined = us_dedup[:us_quota] + id_dedup[:id_quota]
-    combined = dedup(combined)  # final dedup
-
-    log.info(f'Total berita unik: {len(combined)} (US={len(us_dedup[:us_quota])}, ID={len(id_dedup[:id_quota])})')
+    combined = dedup(us_dedup[:us_quota] + id_dedup[:id_quota])
+    log.info(f'Total berita unik: {len(combined)} (US={min(len(us_dedup), us_quota)}, ID={min(len(id_dedup), id_quota)})')
     return combined
 
-# ─── SENTIMENT ANALYSIS ───────────────────────────────────────────────────────
-
+# ─── SENTIMENT & GEO ANALYSIS ─────────────────────────────────────────────────
 def analyze_sentiment(text):
     t = text.lower()
     score = sum(1 for w in BULLISH_WORDS if w in t) - sum(1 for w in BEARISH_WORDS if w in t)
-    if score >= 2:
+    if score >= 1:
         return 'Bullish', score
-    if score <= -2:
+    if score <= -1:
         return 'Bearish', score
     return 'Netral', score
 
@@ -307,91 +473,179 @@ def find_tickers(text):
     return [m for m in TICKER_RE.findall(text) if m in KNOWN_TICKERS]
 
 def is_geopolitical(article):
-    text = (article['judul'] + ' ' + article['ringkasan']).lower()
+    text = (article['judul'] + ' ' + article.get('ringkasan', '')).lower()
     return any(kw in text for kw in GEO_KEYWORDS)
 
 def categorize_geo(article):
-    text = (article['judul'] + ' ' + article['ringkasan']).lower()
+    text = (article['judul'] + ' ' + article.get('ringkasan', '')).lower()
     for kw_list, label in GEO_KATEGORI_MAP:
         if any(kw in text for kw in kw_list):
             return label
-    return 'Global'
+    return 'Pasar Saham AS'
 
 # ─── ECONOMIC CALENDAR ────────────────────────────────────────────────────────
-
 def _stock_impact_hint(title):
     t = title.lower()
     if 'non-farm' in t or 'nfp' in t:
-        return 'Di atas ekspektasi → S&P naik; Di bawah ekspektasi → S&P turun'
-    if 'cpi' in t or 'inflation' in t:
+        return 'Di atas ekspektasi → S&P naik; Di bawah → S&P turun'
+    if 'cpi' in t or 'consumer price' in t:
         return 'CPI tinggi → Fed hawkish → pasar turun; CPI rendah → potensi rate cut → naik'
-    if 'fomc' in t or 'federal reserve' in t or 'fed rate' in t or 'interest rate decision' in t:
-        return 'Rate hike → negatif untuk saham; Rate cut / dovish → sangat positif'
+    if 'pce' in t:
+        return 'PCE adalah inflasi favorit Fed — tinggi berarti hawkish → negatif pasar'
+    if 'fomc' in t or 'federal open' in t or 'interest rate decision' in t:
+        return 'Rate hike → negatif saham; Rate cut / dovish → sangat positif'
     if 'gdp' in t:
         return 'GDP kuat → ekonomi sehat → positif; GDP lemah → kekhawatiran resesi → negatif'
     if 'unemployment' in t or 'jobless' in t:
         return 'Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat'
     if 'retail sales' in t:
-        return 'Penjualan retail kuat → konsumsi tinggi → positif untuk saham consumer'
+        return 'Penjualan retail kuat → konsumsi tinggi → positif saham consumer'
     if 'pmi' in t:
         return 'PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)'
     if 'ism' in t:
-        return 'ISM tinggi → manufaktur/jasa kuat → positif untuk ekonomi'
-    if 'housing' in t or 'home' in t:
+        return 'ISM tinggi → manufaktur/jasa kuat → positif ekonomi AS'
+    if 'housing' in t or 'home sales' in t or 'building' in t:
         return 'Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen'
+    if 'adp' in t:
+        return 'Prekursor NFP — ADP kuat → ekspektasi NFP tinggi → pasar naik'
+    if 'treasury' in t or 'yield' in t or '-year' in t:
+        return 'Imbal hasil naik → saham growth tertekan; imbal hasil turun → saham teknologi naik'
+    if 'powell' in t or 'fed chair' in t or 'fed speak' in t:
+        return 'Nada dovish → pasar naik; nada hawkish → pasar turun'
+    if 'oil' in t or 'crude' in t or 'natural gas' in t:
+        return 'Stok naik → harga energi turun → positif sektor konsumer; stok turun → energi naik'
     return 'Pantau reaksi pasar — volatilitas mungkin terjadi'
 
-def fetch_economic_calendar():
-    log.info('── Mengambil kalender ekonomi ──')
-    today = today_str()
-    events = []
+def _format_event(ev, tanggal_label='Hari Ini'):
+    impact = ev.get('impact', 'Low')
+    title  = ev.get('title', '—')
+    return {
+        'waktu':         (ev.get('time') or '—') + ' ET',
+        'event':         title,
+        'event_id':      translate_event_name(title),
+        'dampak':        DAMPAK_MAP.get(impact, 'Rendah'),
+        'dampak_en':     impact,
+        'mata_uang':     'USD',
+        'aktual':        ev.get('actual')   or '—',
+        'perkiraan':     ev.get('forecast') or '—',
+        'sebelumnya':    ev.get('previous') or '—',
+        'dampak_saham':  _stock_impact_hint(title),
+        'tanggal_label': tanggal_label,
+    }
+
+def _fetch_ff_json(url):
     try:
-        resp = requests.get(
-            'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
-            headers=HEADERS, timeout=15
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        for ev in data:
-            if ev.get('country', '').upper() != 'USD':
-                continue
-            ev_date = str(ev.get('date', ''))[:10]
-            if ev_date != today:
-                continue
-            impact = ev.get('impact', 'Low')
-            events.append({
-                'waktu':        (ev.get('time') or '—') + ' ET',
-                'event':        ev.get('title', '—'),
-                'dampak':       DAMPAK_MAP.get(impact, 'Rendah'),
-                'dampak_en':    impact,
-                'mata_uang':    'USD',
-                'aktual':       ev.get('actual')   or '—',
-                'perkiraan':    ev.get('forecast')  or '—',
-                'sebelumnya':   ev.get('previous')  or '—',
-                'dampak_saham': _stock_impact_hint(ev.get('title', '')),
-            })
-        log.info(f'Kalender hari ini: {len(events)} event USD')
+        r = requests.get(url, headers=HEADERS, timeout=15)
+        r.raise_for_status()
+        return r.json()
     except Exception as e:
-        log.error(f'Gagal ambil kalender: {e}')
-    return events
+        log.warning(f'  Kalender [{url.split("/")[-1]}] gagal: {e}')
+        return []
+
+def _last_business_day(date_str: str) -> str:
+    """Kembalikan hari kerja (Sen-Jum) terakhir sebelum date_str."""
+    d = _date.fromisoformat(date_str) - timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d.isoformat()
+
+def fetch_economic_calendar():
+    log.info('-- Mengambil kalender ekonomi (ForexFactory / investing.com) --')
+    today = today_str()
+
+    # Ambil data dari 2 endpoint: minggu ini + minggu depan
+    all_data: list = []
+    all_data.extend(_fetch_ff_json('https://nfs.faireconomy.media/ff_calendar_thisweek.json'))
+    time.sleep(0.5)
+    all_data.extend(_fetch_ff_json('https://nfs.faireconomy.media/ff_calendar_nextweek.json'))
+
+    all_usd = [ev for ev in all_data if ev.get('country', '').upper() == 'USD']
+    available_dates = sorted(set(str(ev.get('date', ''))[:10] for ev in all_usd))
+    log.info(f'  Data kalender tersedia untuk: {available_dates}')
+
+    def filter_usd(target_date: str, label: str) -> list:
+        return [
+            _format_event(ev, label)
+            for ev in all_usd
+            if str(ev.get('date', ''))[:10] == target_date
+        ]
+
+    events = filter_usd(today, 'Hari Ini')
+    weekend_mode = False
+    calendar_note = ''
+
+    # Fallback 1: coba hari kerja berikutnya (data mungkin sudah ada)
+    if len(events) < 3:
+        nbd = _next_business_day(today)
+        nbd_events = filter_usd(nbd, f'Besok ({nbd})')
+        if nbd_events:
+            log.info(f'  Tidak ada event hari ini, pakai besok ({nbd}): {len(nbd_events)} event')
+            events.extend(nbd_events)
+            weekend_mode = True
+
+    # Fallback 2: tampilkan minggu lalu jika data belum tersedia
+    if len(events) < 5:
+        lbd = _last_business_day(today)
+        log.info(f'  Data mendatang belum tersedia, pakai minggu lalu ({lbd})')
+        past_events = []
+        # Ambil 3-4 hari kerja terakhir
+        d = lbd
+        for _ in range(5):
+            day_evts = filter_usd(d, f'Ringkasan ({d})')
+            past_events.extend(day_evts)
+            if len(past_events) >= 15:
+                break
+            d = _last_business_day(d)
+        if past_events:
+            events.extend(past_events[:20])
+            weekend_mode = True
+            calendar_note = (
+                'Hari ini adalah akhir pekan — pasar tutup. '
+                'Menampilkan ringkasan kalender ekonomi minggu lalu sebagai referensi. '
+                'Data minggu depan akan tersedia Senin pagi.'
+            )
+
+    log.info(f'  Kalender: {len(events)} event USD | weekend_mode={weekend_mode}')
+    return events, weekend_mode, calendar_note
 
 # ─── DATA PREPARATION ─────────────────────────────────────────────────────────
-
-def prepare_kalender(events):
+def prepare_kalender(events, weekend_mode=False, calendar_note=''):
     tinggi = sum(1 for e in events if e['dampak'] == 'Tinggi')
+    dt = now_wib()
+    hari_names = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu']
+    if not calendar_note and weekend_mode:
+        calendar_note = (f'Hari ini ({hari_names[dt.weekday()]}) tidak ada event USD baru. '
+                         'Menampilkan event hari kerja berikutnya.')
     return {
-        'tanggal':         today_str(),
-        'hari_ini_label':  hari_label(),
-        'jam_update':      fmt_wib(),
-        'total_event':     len(events),
-        'event_tinggi':    tinggi,
-        'hari_ini':        events,
+        'tanggal':        today_str(),
+        'hari_ini_label': hari_label(),
+        'jam_update':     fmt_wib(),
+        'total_event':    len(events),
+        'event_tinggi':   tinggi,
+        'weekend_mode':   weekend_mode,
+        'catatan':        calendar_note,
+        'hari_ini':       events,
     }
+
+def _rekomendasi_pasar(avg: float) -> str:
+    if avg >= 2.5:
+        return 'BELI KUAT — Sentimen sangat bullish. Pertimbangkan posisi long pada setiap pullback ke support.'
+    if avg >= 1.5:
+        return 'BELI — Sentimen positif. Pantau level resistance sebelum entry, perhatikan volume.'
+    if avg >= 0.5:
+        return 'HATI-HATI BELI — Sentimen sedikit bullish. Gunakan position sizing kecil, konfirmasi breakout dulu.'
+    if avg <= -2.5:
+        return 'JUAL/SHORT — Sentimen sangat bearish. Risiko koreksi tinggi, pertimbangkan lindung nilai.'
+    if avg <= -1.5:
+        return 'KURANGI POSISI — Sentimen negatif. Kurangi eksposur, hindari pembelian baru.'
+    if avg <= -0.5:
+        return 'NETRAL/HATI-HATI — Sedikit tekanan jual. Tunggu konfirmasi pembalikan sebelum entry baru.'
+    return 'NETRAL — Pasar mixed. Tunggu katalis yang jelas; fokus pada saham dengan fundamental kuat.'
 
 def prepare_sentimen(articles):
     scored = []
     for a in articles:
-        text    = a['judul'] + ' ' + a['ringkasan']
+        text    = a['judul'] + ' ' + a.get('judul_id', '') + ' ' + a['ringkasan']
         label, score = analyze_sentiment(text)
         tickers = find_tickers(text)
         scored.append({**a, 'sentimen': label, 'skor': score, 'tickers': tickers})
@@ -401,21 +655,28 @@ def prepare_sentimen(articles):
     bearish = [x for x in scored if x['sentimen'] == 'Bearish']
     netral  = [x for x in scored if x['sentimen'] == 'Netral']
 
-    avg = sum(x['skor'] for x in scored) / total
-    overall = 'Bullish' if avg >= 1.5 else 'Bearish' if avg <= -1.5 else 'Netral'
+    avg     = sum(x['skor'] for x in scored) / total
+    overall = 'Bullish' if avg >= 0.5 else 'Bearish' if avg <= -0.5 else 'Netral'
 
     def idx_sent(kw_list):
-        arts = [x for x in scored if any(k in (x['judul']+x['ringkasan']).lower() for k in kw_list)]
+        arts = [
+            x for x in scored
+            if any(k in (x['judul'] + ' ' + x.get('judul_id','') + ' ' + x['ringkasan']).lower()
+                   for k in kw_list)
+        ]
         if not arts:
             return {'sentimen': 'Netral', 'skor': 0.0, 'jumlah_berita': 0}
         s = sum(x['skor'] for x in arts) / len(arts)
-        return {
-            'sentimen':      'Bullish' if s >= 1 else 'Bearish' if s <= -1 else 'Netral',
-            'skor':          round(s, 2),
-            'jumlah_berita': len(arts),
-        }
+        label = 'Bullish' if s >= 0.5 else 'Bearish' if s <= -0.5 else 'Netral'
+        return {'sentimen': label, 'skor': round(s, 2), 'jumlah_berita': len(arts)}
 
-    ticker_map = {}
+    sp500_kw  = ['s&p', 'sp500', 's&p 500', 'spx', 'spy', 'stock market', 'equities',
+                 'wall street', 'market rally', 'market crash', 'broad market']
+    nasdaq_kw = ['nasdaq', 'qqq', 'tech stock', 'technology', 'tech company',
+                 'growth stock', 'ai stock', 'semiconductor', 'software']
+    dow_kw    = ['dow jones', 'djia', 'dow', 'dia', 'blue chip', 'industrial', 'transportation']
+
+    ticker_map: dict = {}
     for a in scored:
         for t in a['tickers']:
             if t not in ticker_map:
@@ -424,12 +685,12 @@ def prepare_sentimen(articles):
             ticker_map[t]['count']      += 1
 
     hot_bullish = sorted(
-        [{'ticker': t, 'judul': v['judul'], 'skor': v['skor_total'], 'count': v['count']}
+        [{'ticker': t, 'judul': v['judul'], 'judul_id': '', 'skor': v['skor_total'], 'count': v['count']}
          for t, v in ticker_map.items() if v['skor_total'] > 0],
         key=lambda x: x['skor'], reverse=True)[:5]
 
     hot_bearish = sorted(
-        [{'ticker': t, 'judul': v['judul'], 'skor': v['skor_total'], 'count': v['count']}
+        [{'ticker': t, 'judul': v['judul'], 'judul_id': '', 'skor': v['skor_total'], 'count': v['count']}
          for t, v in ticker_map.items() if v['skor_total'] < 0],
         key=lambda x: x['skor'])[:5]
 
@@ -444,10 +705,11 @@ def prepare_sentimen(articles):
             'netral_pct':   round(len(netral)  / total * 100),
             'total_berita': len(scored),
         },
+        'rekomendasi_pasar': _rekomendasi_pasar(avg),
         'indeks': {
-            'sp500':     idx_sent(['s&p', 'sp500', 's&p 500']),
-            'nasdaq':    idx_sent(['nasdaq', 'qqq']),
-            'dow_jones': idx_sent(['dow jones', 'djia', 'dow', 'dia']),
+            'sp500':     idx_sent(sp500_kw),
+            'nasdaq':    idx_sent(nasdaq_kw),
+            'dow_jones': idx_sent(dow_kw),
         },
         'saham_panas': {
             'bullish': hot_bullish,
@@ -456,23 +718,57 @@ def prepare_sentimen(articles):
         'berita': scored[:50],
     }
 
+# Keyword fallback untuk artikel pasar AS (jika artikel geopolitik < 30)
+_US_MARKET_KW = [
+    'stock', 'market', 'share', 'equity', 'wall street', 'nasdaq',
+    's&p', 'dow', 'fed', 'economy', 'earnings', 'revenue', 'profit',
+    'invest', 'portfolio', 'fund', 'ipo', 'merger', 'acquisition',
+    'dividend', 'buyback', 'analyst', 'forecast', 'outlook', 'sector',
+]
+
 def prepare_geopolitik(articles):
-    geo = []
+    geo   = []
+    geo_ids: set = set()
+
+    # Fase 1: berita yang cocok dengan GEO_KEYWORDS
     for a in articles:
         if not is_geopolitical(a):
             continue
-        text   = a['judul'] + ' ' + a['ringkasan']
+        text  = a['judul'] + ' ' + a.get('ringkasan', '')
         label, score = analyze_sentiment(text)
         dampak = 'Positif' if label == 'Bullish' else 'Negatif' if label == 'Bearish' else 'Netral'
         geo.append({
             **a,
-            'sentimen':    label,
-            'skor':        score,
-            'kategori':    categorize_geo(a),
+            'sentimen':     label,
+            'skor':         score,
+            'kategori':     categorize_geo(a),
             'dampak_pasar': dampak,
         })
+        geo_ids.add(id(a))
+
+    # Fase 2: jika < 30, tambahkan artikel pasar AS yang relevan
+    if len(geo) < 30:
+        log.info(f'  Geopolitik fase 1: {len(geo)} berita, tambahkan berita pasar AS...')
+        for a in articles:
+            if id(a) in geo_ids:
+                continue
+            text = (a['judul'] + ' ' + a.get('ringkasan', '')).lower()
+            if any(kw in text for kw in _US_MARKET_KW):
+                label, score = analyze_sentiment(a['judul'] + ' ' + a.get('ringkasan', ''))
+                dampak = 'Positif' if label == 'Bullish' else 'Negatif' if label == 'Bearish' else 'Netral'
+                geo.append({
+                    **a,
+                    'sentimen':     label,
+                    'skor':         score,
+                    'kategori':     categorize_geo(a),
+                    'dampak_pasar': dampak,
+                })
+                geo_ids.add(id(a))
+            if len(geo) >= 50:
+                break
 
     geo.sort(key=lambda x: abs(x['skor']), reverse=True)
+    log.info(f'  Geopolitik total: {len(geo)} berita')
 
     return {
         'tanggal':      today_str(),
@@ -482,7 +778,6 @@ def prepare_geopolitik(articles):
     }
 
 # ─── FILE WRITERS ─────────────────────────────────────────────────────────────
-
 def save_json_files(kalender, sentimen, geopolitik):
     for path, data in [
         (KALENDER_FILE,   kalender),
@@ -495,7 +790,7 @@ def save_json_files(kalender, sentimen, geopolitik):
 
 def generate_js_data(kalender, sentimen, geopolitik):
     ts  = fmt_wib()
-    js  = f'// Auto-generated by stock_news_digest.py — {ts}\n'
+    js  = f'// Auto-generated by stock_news_digest.py v2.1 — {ts}\n'
     js += f'// Jangan edit manual — file ini di-overwrite setiap hari jam 07:00 WIB\n'
     js += f'var STOCK_LAST_UPDATE = {json.dumps(ts)};\n'
     js += f'var STOCK_KALENDER   = {json.dumps(kalender,   ensure_ascii=False)};\n'
@@ -506,7 +801,6 @@ def generate_js_data(kalender, sentimen, geopolitik):
     log.info(f'  JS data: {os.path.basename(DATA_JS_FILE)}')
 
 # ─── EMAIL CSS ────────────────────────────────────────────────────────────────
-
 _CSS = """
 body{font-family:'Segoe UI',Arial,sans-serif;background:#0a1628;color:#f0f4f8;margin:0;padding:16px}
 .wrap{max-width:680px;margin:0 auto}
@@ -534,12 +828,14 @@ td{padding:9px 10px;font-size:11px;color:#8899aa;border-bottom:1px solid rgba(25
 .mbig{font-size:26px;font-weight:700;font-family:monospace}
 .alink{display:inline-block;padding:3px 9px;border-radius:6px;font-size:10px;background:rgba(59,130,246,.15);color:#3b82f6;text-decoration:none}
 .footer{text-align:center;font-size:10px;color:#4a5568;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.04)}
+.note{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 14px;font-size:11px;color:#f59e0b;margin-bottom:12px}
+.rekomen{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:12px 16px;font-size:13px;font-weight:600;color:#10b981;margin-bottom:12px;text-align:center}
 """
 
 def _chip_dampak(d):
-    if d == 'Tinggi': return f'<span class="chip high">🔴 Tinggi</span>'
-    if d == 'Sedang': return f'<span class="chip mid">🟡 Sedang</span>'
-    return f'<span class="chip low">🟢 Rendah</span>'
+    if d == 'Tinggi': return '<span class="chip high">🔴 Tinggi</span>'
+    if d == 'Sedang': return '<span class="chip mid">🟡 Sedang</span>'
+    return '<span class="chip low">🟢 Rendah</span>'
 
 def _chip_sen(s):
     if s == 'Bullish': return '<span class="chip bull">▲ Bullish</span>'
@@ -547,39 +843,53 @@ def _chip_sen(s):
     return '<span class="chip neut">→ Netral</span>'
 
 # ─── EMAIL BUILDER 1: KALENDER ────────────────────────────────────────────────
-
 def build_email_kalender(kal):
     events = kal.get('hari_ini', [])
-    rows   = ''
+    catatan_html = ''
+    if kal.get('catatan'):
+        catatan_html = f'<div class="note">⚠️ {kal["catatan"]}</div>'
+
+    rows = ''
     for e in events:
+        lbl = e.get('tanggal_label', 'Hari Ini')
+        lbl_color = '#f59e0b' if lbl != 'Hari Ini' else '#8899aa'
+        event_display = e.get('event_id', e['event'])
+        event_en = e['event'] if e.get('event_id', '') != e['event'] else ''
         rows += f"""<tr>
-<td style="color:#f0f4f8;font-weight:700;white-space:nowrap;font-family:monospace">{e['waktu']}</td>
-<td><div class="ttxt">{e['event']}</div>
-    <div style="font-size:10px;color:#4a5568;margin-top:3px">{e.get('dampak_saham','')}</div></td>
+<td style="color:#f0f4f8;font-weight:700;white-space:nowrap;font-family:monospace">
+  {e['waktu']}<br><span style="font-size:9px;color:{lbl_color}">{lbl}</span>
+</td>
+<td>
+  <div class="ttxt">{event_display}</div>
+  {'<div style="font-size:10px;color:#4a5568">'+event_en+'</div>' if event_en else ''}
+  <div style="font-size:10px;color:#4a5568;margin-top:3px">{e.get('dampak_saham','')}</div>
+</td>
 <td>{_chip_dampak(e['dampak'])}</td>
 <td style="font-family:monospace;color:#10b981">{e['aktual']}</td>
 <td style="font-family:monospace;color:#8899aa">{e['perkiraan']}</td>
 <td style="font-family:monospace;color:#8899aa">{e['sebelumnya']}</td>
 </tr>"""
+
     if not rows:
-        rows = '<tr><td colspan="6" style="text-align:center;padding:22px;color:#4a5568">Tidak ada event ekonomi USD hari ini — pasar lebih tenang</td></tr>'
+        rows = '<tr><td colspan="6" style="text-align:center;padding:22px;color:#4a5568">Tidak ada event ekonomi USD — pasar lebih tenang</td></tr>'
 
     return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><style>{_CSS}</style></head>
 <body><div class="wrap">
 <div class="hdr">
-  <div class="htitle">📅 Kalender Ekonomi Saham</div>
+  <div class="htitle">📅 Kalender Ekonomi Saham AS</div>
   <div class="hsub">{kal.get('hari_ini_label','')} &nbsp;·&nbsp; Diperbarui: {kal.get('jam_update','')}</div>
 </div>
 <div class="body">
+  {catatan_html}
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-    <div class="metric"><div class="mlbl">Event USD</div><div class="mbig" style="color:#f59e0b">{kal.get('total_event',0)}</div></div>
+    <div class="metric"><div class="mlbl">Total Event USD</div><div class="mbig" style="color:#f59e0b">{kal.get('total_event',0)}</div></div>
     <div class="metric"><div class="mlbl">Dampak Tinggi</div><div class="mbig" style="color:#f43f5e">{kal.get('event_tinggi',0)}</div></div>
     <div class="metric"><div class="mlbl">Zona Waktu</div><div style="font-size:15px;font-weight:700;color:#3b82f6;margin-top:4px">ET = WIB−12</div></div>
   </div>
   <div class="sec">
-    <div class="stitle">🗓 Event Ekonomi USD Hari Ini</div>
+    <div class="stitle">🗓 Event Ekonomi USD (Investing.com / ForexFactory / MarketWatch)</div>
     <table><thead><tr>
-      <th>Waktu ET</th><th>Event</th><th>Dampak</th>
+      <th>Waktu ET</th><th>Event (Bahasa Indonesia)</th><th>Dampak</th>
       <th>Aktual</th><th>Perkiraan</th><th>Sebelumnya</th>
     </tr></thead><tbody>{rows}</tbody></table>
   </div>
@@ -588,19 +898,20 @@ def build_email_kalender(kal):
     <div>🔴 <b style="color:#f43f5e">Dampak Tinggi</b> — NFP, CPI, FOMC: <em>hindari trade besar sebelum rilis</em>, volatilitas ekstrem</div>
     <div>🟡 <b style="color:#f59e0b">Dampak Sedang</b> — Retail Sales, Jobless Claims: perhatikan arah trend</div>
     <div>🟢 <b style="color:#3b82f6">Dampak Rendah</b> — Data minor: dampak terbatas</div>
-    <div style="margin-top:8px;color:#10b981">✅ <b>Aktual &gt; Perkiraan</b> = umumnya bullish untuk S&P 500 &amp; NASDAQ (kecuali CPI)</div>
+    <div style="margin-top:8px;color:#10b981">✅ <b>Aktual &gt; Perkiraan</b> = umumnya bullish untuk S&P 500 &amp; NASDAQ (kecuali CPI/inflasi)</div>
+    <div style="color:#f59e0b">⚠️ <b>Aktual &lt; Perkiraan</b> = umumnya bearish — waspadai volatilitas</div>
   </div>
 </div>
-<div class="footer">StockJournal Pro &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {kal.get('tanggal','')}</div>
+<div class="footer">StockJournal Pro v2.1 &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {kal.get('tanggal','')}</div>
 </div></body></html>"""
 
 # ─── EMAIL BUILDER 2: SENTIMEN ────────────────────────────────────────────────
-
 def build_email_sentimen(sen):
-    ring  = sen.get('ringkasan', {})
-    idx   = sen.get('indeks', {})
-    panas = sen.get('saham_panas', {})
+    ring   = sen.get('ringkasan', {})
+    idx    = sen.get('indeks', {})
+    panas  = sen.get('saham_panas', {})
     berita = sen.get('berita', [])
+    rekomen = sen.get('rekomendasi_pasar', '')
 
     overall = ring.get('overall', 'Netral')
     skor    = ring.get('skor_rata', 0)
@@ -619,8 +930,12 @@ def build_email_sentimen(sen):
 <td style="color:#8899aa">{d.get('jumlah_berita',0)} berita</td>
 </tr>"""
 
-    bull_chips = ''.join(f'<span class="chip bull" style="margin:3px;display:inline-block">{s["ticker"]} +{s["skor"]}</span>' for s in panas.get('bullish', []))
-    bear_chips = ''.join(f'<span class="chip bear" style="margin:3px;display:inline-block">{s["ticker"]} {s["skor"]}</span>'  for s in panas.get('bearish', []))
+    bull_chips = ''.join(
+        f'<span class="chip bull" style="margin:3px;display:inline-block">{s["ticker"]} +{s["skor"]}</span>'
+        for s in panas.get('bullish', []))
+    bear_chips = ''.join(
+        f'<span class="chip bear" style="margin:3px;display:inline-block">{s["ticker"]} {s["skor"]}</span>'
+        for s in panas.get('bearish', []))
 
     news_rows = ''
     for a in berita[:30]:
@@ -629,21 +944,32 @@ def build_email_sentimen(sen):
         sk_col = '#10b981' if sk > 0 else '#f43f5e' if sk < 0 else '#8899aa'
         url = a.get('url', '')
         lnk = f'<a href="{url}" class="alink" target="_blank">Baca ↗</a>' if url and url != '#' else ''
+        judul_show = a.get('judul_id') or a['judul']
+        judul_en   = a['judul'] if a.get('judul_id', '') != a['judul'] else ''
         news_rows += f"""<tr>
 <td style="width:75px">{_chip_sen(s)}</td>
-<td><div class="ttxt">{a['judul'][:120]}</div>
-    <div class="src">{a['sumber']} · {a['asal']} · {a.get('waktu','')[:10]}</div>
-    {lnk}</td>
+<td>
+  <div class="ttxt">{judul_show[:130]}</div>
+  {'<div style="font-size:10px;color:#4a5568;margin-top:2px">'+judul_en[:110]+'</div>' if judul_en else ''}
+  <div class="src">{a['sumber']} · {a['asal']} · {a.get('waktu','')[:10]}</div>
+  {lnk}
+</td>
 <td style="font-family:monospace;color:{sk_col};white-space:nowrap">{'+' if sk>0 else ''}{sk}</td>
 </tr>"""
+
+    rekomen_html = ''
+    if rekomen:
+        col = '#10b981' if 'BELI' in rekomen else '#f43f5e' if 'JUAL' in rekomen else '#f59e0b'
+        rekomen_html = f'<div class="rekomen" style="color:{col};border-color:{col}22">🎯 {rekomen}</div>'
 
     return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><style>{_CSS}</style></head>
 <body><div class="wrap">
 <div class="hdr">
-  <div class="htitle">📊 Analisis Sentimen Saham</div>
+  <div class="htitle">📊 Analisis Sentimen Pasar Saham AS</div>
   <div class="hsub">Diperbarui: {sen.get('jam_update','')} &nbsp;·&nbsp; {ring.get('total_berita',0)} berita dianalisis</div>
 </div>
 <div class="body">
+  {rekomen_html}
   <div class="sec" style="text-align:center">
     <div class="mlbl">Sentimen Pasar Keseluruhan</div>
     <div style="font-size:38px;font-weight:700;color:{ov_col};font-family:monospace;margin:8px 0">{ov_icon} {overall}</div>
@@ -665,16 +991,15 @@ def build_email_sentimen(sen):
     <div><div style="font-size:10px;color:#8899aa;margin-bottom:6px">BEARISH ▼</div>{bear_chips or '<span style="color:#4a5568">—</span>'}</div>
   </div>
   <div class="sec">
-    <div class="stitle">📰 30 Berita Terkini + Sentimen (80% US / 20% Indonesia)</div>
+    <div class="stitle">📰 30 Berita + Sentimen (Terjemahan Bahasa Indonesia)</div>
     <table><thead><tr><th style="width:80px">Sentimen</th><th>Berita</th><th>Skor</th></tr></thead>
     <tbody>{news_rows}</tbody></table>
   </div>
 </div>
-<div class="footer">StockJournal Pro &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {sen.get('tanggal','')}</div>
+<div class="footer">StockJournal Pro v2.1 &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {sen.get('tanggal','')}</div>
 </div></body></html>"""
 
 # ─── EMAIL BUILDER 3: GEOPOLITIK ──────────────────────────────────────────────
-
 def build_email_geopolitik(geo):
     berita = geo.get('berita', [])
     items  = ''
@@ -683,40 +1008,44 @@ def build_email_geopolitik(geo):
         d_icon = '▲' if a['dampak_pasar']=='Positif' else '▼' if a['dampak_pasar']=='Negatif' else '→'
         url    = a.get('url', '')
         lnk    = f'<a href="{url}" class="alink" style="display:inline-block;margin-top:6px" target="_blank">Baca ↗</a>' if url and url != '#' else ''
+        judul_show = a.get('judul_id') or a['judul']
+        judul_en   = a['judul'] if a.get('judul_id', '') != a['judul'] else ''
         items  += f"""<div style="background:#0a1628;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;margin-bottom:10px">
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap">
-    <span class="chip geo">{a.get('kategori','Global')}</span>
+    <span class="chip geo">{a.get('kategori','Pasar Saham AS')}</span>
     <span style="font-size:10px;color:{d_col}">{d_icon} Dampak {a['dampak_pasar']}</span>
+    <span style="font-size:10px;color:#4a5568">{_chip_sen(a.get('sentimen','Netral'))}</span>
   </div>
-  <div class="ttxt" style="margin-bottom:5px">{a['judul'][:160]}</div>
+  <div class="ttxt" style="margin-bottom:4px">{judul_show[:160]}</div>
+  {'<div style="font-size:10px;color:#4a5568;margin-bottom:4px">'+judul_en[:140]+'</div>' if judul_en else ''}
   <div style="font-size:11px;color:#8899aa;line-height:1.6;margin-bottom:5px">{a.get('ringkasan','')[:240]}</div>
   <div style="font-size:10px;color:#4a5568">{a['sumber']} · {a['asal']} · {a.get('waktu','')[:10]}</div>
   {lnk}
 </div>"""
+
     if not items:
-        items = '<div style="text-align:center;padding:24px;color:#4a5568">Tidak ada berita geopolitik signifikan hari ini</div>'
+        items = '<div style="text-align:center;padding:24px;color:#4a5568">Tidak ada berita geopolitik/pasar signifikan hari ini</div>'
 
     return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><style>{_CSS}</style></head>
 <body><div class="wrap">
 <div class="hdr">
-  <div class="htitle">🌍 Geopolitik &amp; Dampak Pasar Saham</div>
-  <div class="hsub">Diperbarui: {geo.get('jam_update','')} &nbsp;·&nbsp; {geo.get('total_berita',0)} berita geopolitik teridentifikasi</div>
+  <div class="htitle">🌍 Geopolitik &amp; Pasar Saham Amerika</div>
+  <div class="hsub">Diperbarui: {geo.get('jam_update','')} &nbsp;·&nbsp; {geo.get('total_berita',0)} berita teridentifikasi</div>
 </div>
 <div class="body">
   <div class="sec" style="font-size:11px;color:#8899aa;line-height:1.8">
-    ⚠️ Berita di bawah adalah isu geopolitik yang dapat mempengaruhi pasar saham AS dan global.
-    Perhatikan dampak terhadap <b style="color:#f0f4f8">S&amp;P 500, NASDAQ, sektor energi, teknologi, dan keuangan</b>.
+    ⚠️ Berita di bawah mencakup isu geopolitik dan berita pasar saham AS yang dapat mempengaruhi
+    <b style="color:#f0f4f8">S&amp;P 500, NASDAQ, Dow Jones, sektor energi, teknologi, dan keuangan</b>.
   </div>
   <div class="sec">
-    <div class="stitle">🌐 Berita Geopolitik ({min(len(berita),30)} dari {geo.get('total_berita',0)})</div>
+    <div class="stitle">🌐 Berita Geopolitik &amp; Pasar AS ({min(len(berita),30)} dari {geo.get('total_berita',0)}) — Bahasa Indonesia</div>
     {items}
   </div>
 </div>
-<div class="footer">StockJournal Pro &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {geo.get('tanggal','')}</div>
+<div class="footer">StockJournal Pro v2.1 &nbsp;·&nbsp; Dikirim otomatis jam 07:00 WIB &nbsp;·&nbsp; {geo.get('tanggal','')}</div>
 </div></body></html>"""
 
 # ─── EMAIL SENDER ─────────────────────────────────────────────────────────────
-
 def send_email(cfg, subject, html_body):
     try:
         msg = MIMEMultipart('alternative')
@@ -739,10 +1068,9 @@ def send_email(cfg, subject, html_body):
     return False
 
 # ─── MAIN ORCHESTRATOR ────────────────────────────────────────────────────────
-
 def run_digest():
     log.info('═' * 64)
-    log.info(f'STOCK DIGEST MULAI — {fmt_wib()}')
+    log.info(f'STOCK DIGEST v2.1 MULAI — {fmt_wib()}')
     log.info('═' * 64)
 
     cfg = load_config()
@@ -755,42 +1083,45 @@ def run_digest():
     if len(articles) < 5:
         log.warning(f'Hanya {len(articles)} berita — periksa koneksi internet')
 
-    # 2. Ambil kalender
-    cal_events = fetch_economic_calendar()
+    # 2. Terjemahkan judul artikel ke Bahasa Indonesia
+    translate_articles(articles, max_count=40)
 
-    # 3. Siapkan data
-    log.info('── Menyiapkan analisis ──')
-    kalender   = prepare_kalender(cal_events)
+    # 3. Ambil kalender ekonomi
+    cal_events, weekend_mode, cal_note = fetch_economic_calendar()
+
+    # 4. Siapkan data
+    log.info('-- Menyiapkan analisis --')
+    kalender   = prepare_kalender(cal_events, weekend_mode, cal_note)
     sentimen   = prepare_sentimen(articles)
     geopolitik = prepare_geopolitik(articles)
 
     log.info(f"  Kalender:   {kalender['total_event']} event USD")
     log.info(f"  Sentimen:   {sentimen['ringkasan']['total_berita']} berita → {sentimen['ringkasan']['overall']}")
     log.info(f"  Geopolitik: {geopolitik['total_berita']} berita")
+    log.info(f"  Rekomendasi: {sentimen['rekomendasi_pasar'][:60]}...")
 
-    # 4. Simpan file
+    # 5. Simpan file JSON + JS
     log.info('── Menyimpan data ──')
     save_json_files(kalender, sentimen, geopolitik)
     generate_js_data(kalender, sentimen, geopolitik)
 
-    # 5. Kirim 3 email
+    # 6. Kirim 3 email
     log.info('── Mengirim email ──')
     today = today_str()
-    send_email(cfg, f'📅 Kalender Ekonomi Saham — {today}', build_email_kalender(kalender))
+    send_email(cfg, f'📅 Kalender Ekonomi Saham AS — {today}',  build_email_kalender(kalender))
     time.sleep(2)
-    send_email(cfg, f'📊 Analisis Sentimen Saham — {today}',  build_email_sentimen(sentimen))
+    send_email(cfg, f'📊 Analisis Sentimen Pasar Saham — {today}', build_email_sentimen(sentimen))
     time.sleep(2)
-    send_email(cfg, f'🌍 Geopolitik Pasar Saham — {today}',   build_email_geopolitik(geopolitik))
+    send_email(cfg, f'🌍 Geopolitik & Pasar Saham AS — {today}',   build_email_geopolitik(geopolitik))
 
     log.info('═' * 64)
     log.info(f'SELESAI — {fmt_wib()}')
     log.info('═' * 64)
 
 # ─── ENTRY POINT ──────────────────────────────────────────────────────────────
-
 def main():
     import argparse
-    p = argparse.ArgumentParser(description='Stock News Digest — Analisis Saham Otomatis')
+    p = argparse.ArgumentParser(description='Stock News Digest v2.1 — Analisis Saham Otomatis')
     p.add_argument('--run-now', action='store_true', help='Jalankan digest sekarang (skip jadwal)')
     p.add_argument('--setup',   action='store_true', help='Buat ulang config_email.ini')
     args = p.parse_args()

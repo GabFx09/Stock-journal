@@ -300,28 +300,44 @@ def translate_to_id(text: str, timeout: int = 6) -> str:
     _TRANS_CACHE[key] = text
     return text
 
-def translate_articles(articles: list, max_count: int = 40) -> list:
-    """Tambahkan field judul_id (terjemahan Indonesia) ke setiap artikel."""
+def translate_articles(articles: list, max_count: int = 40, max_desc_count: int = 20) -> list:
+    """Tambahkan field judul_id dan ringkasan_id (terjemahan Indonesia) ke setiap artikel."""
     if not TRANSLATE_ENABLED:
         for a in articles:
             a['judul_id'] = a.get('judul', '')
+            a['ringkasan_id'] = a.get('ringkasan', '')
         return articles
 
     log.info(f'── Menerjemahkan judul artikel (maks {max_count}) ──')
-    count = 0
+    title_count = 0
     for a in articles:
         judul = a.get('judul', '')
-        if count < max_count and a.get('asal') == 'US' and judul:
+        if title_count < max_count and a.get('asal') == 'US' and judul:
             a['judul_id'] = translate_to_id(judul)
-            count += 1
+            title_count += 1
             time.sleep(0.25)
         else:
             a['judul_id'] = judul
-    # Isi yang belum diterjemahkan
     for a in articles:
         if 'judul_id' not in a:
             a['judul_id'] = a.get('judul', '')
-    log.info(f'  Terjemahan selesai: {count} judul')
+    log.info(f'  Terjemahan judul selesai: {title_count} judul')
+
+    log.info(f'── Menerjemahkan deskripsi artikel (maks {max_desc_count}) ──')
+    desc_count = 0
+    for a in articles:
+        ringkasan = a.get('ringkasan', '')
+        if desc_count < max_desc_count and a.get('asal') == 'US' and ringkasan and len(ringkasan) > 10:
+            a['ringkasan_id'] = translate_to_id(ringkasan)
+            desc_count += 1
+            time.sleep(0.25)
+        else:
+            a['ringkasan_id'] = ringkasan
+    for a in articles:
+        if 'ringkasan_id' not in a:
+            a['ringkasan_id'] = a.get('ringkasan', '')
+    log.info(f'  Terjemahan deskripsi selesai: {desc_count} deskripsi')
+
     return articles
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -680,17 +696,21 @@ def prepare_sentimen(articles):
     for a in scored:
         for t in a['tickers']:
             if t not in ticker_map:
-                ticker_map[t] = {'skor_total': 0, 'count': 0, 'judul': a['judul']}
+                ticker_map[t] = {
+                    'skor_total': 0, 'count': 0,
+                    'judul': a['judul'],
+                    'judul_id': a.get('judul_id', a['judul']),
+                }
             ticker_map[t]['skor_total'] += a['skor']
             ticker_map[t]['count']      += 1
 
     hot_bullish = sorted(
-        [{'ticker': t, 'judul': v['judul'], 'judul_id': '', 'skor': v['skor_total'], 'count': v['count']}
+        [{'ticker': t, 'judul': v['judul'], 'judul_id': v.get('judul_id', ''), 'skor': v['skor_total'], 'count': v['count']}
          for t, v in ticker_map.items() if v['skor_total'] > 0],
         key=lambda x: x['skor'], reverse=True)[:5]
 
     hot_bearish = sorted(
-        [{'ticker': t, 'judul': v['judul'], 'judul_id': '', 'skor': v['skor_total'], 'count': v['count']}
+        [{'ticker': t, 'judul': v['judul'], 'judul_id': v.get('judul_id', ''), 'skor': v['skor_total'], 'count': v['count']}
          for t, v in ticker_map.items() if v['skor_total'] < 0],
         key=lambda x: x['skor'])[:5]
 
@@ -1008,8 +1028,9 @@ def build_email_geopolitik(geo):
         d_icon = '▲' if a['dampak_pasar']=='Positif' else '▼' if a['dampak_pasar']=='Negatif' else '→'
         url    = a.get('url', '')
         lnk    = f'<a href="{url}" class="alink" style="display:inline-block;margin-top:6px" target="_blank">Baca ↗</a>' if url and url != '#' else ''
-        judul_show = a.get('judul_id') or a['judul']
-        judul_en   = a['judul'] if a.get('judul_id', '') != a['judul'] else ''
+        judul_show     = a.get('judul_id') or a['judul']
+        judul_en       = a['judul'] if a.get('judul_id', '') != a['judul'] else ''
+        ringkasan_show = a.get('ringkasan_id') or a.get('ringkasan', '')
         items  += f"""<div style="background:#0a1628;border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:12px 14px;margin-bottom:10px">
   <div style="display:flex;gap:8px;align-items:center;margin-bottom:7px;flex-wrap:wrap">
     <span class="chip geo">{a.get('kategori','Pasar Saham AS')}</span>
@@ -1018,7 +1039,7 @@ def build_email_geopolitik(geo):
   </div>
   <div class="ttxt" style="margin-bottom:4px">{judul_show[:160]}</div>
   {'<div style="font-size:10px;color:#4a5568;margin-bottom:4px">'+judul_en[:140]+'</div>' if judul_en else ''}
-  <div style="font-size:11px;color:#8899aa;line-height:1.6;margin-bottom:5px">{a.get('ringkasan','')[:240]}</div>
+  <div style="font-size:11px;color:#8899aa;line-height:1.6;margin-bottom:5px">{ringkasan_show[:240]}</div>
   <div style="font-size:10px;color:#4a5568">{a['sumber']} · {a['asal']} · {a.get('waktu','')[:10]}</div>
   {lnk}
 </div>"""

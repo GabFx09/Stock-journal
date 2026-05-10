@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-stock_news_digest.py v2.1 — Analisis Saham Otomatis
+stock_news_digest.py v2.2 — Analisis Saham Otomatis
 Mengumpulkan berita saham, analisis sentimen, dan mengirim 3 email harian jam 07:00 WIB.
 
 Penggunaan:
@@ -8,11 +8,16 @@ Penggunaan:
   python stock_news_digest.py               # Mode daemon — tunggu jam 07:00 WIB setiap hari
   python stock_news_digest.py --setup       # Buat ulang config_email.ini
 
+Pembaruan v2.2:
+  - Terjemahan: pakai Google Translate via deep-translator (semua artikel US, tanpa batas kuota)
+  - Terjemahkan judul → judul_id DAN ringkasan → ringkasan_id untuk setiap artikel
+  - Fallback otomatis ke MyMemory API jika deep-translator gagal
+  - Semua field _id tersedia di JSON untuk dashboard HTML
+
 Pembaruan v2.1:
   - Kalender: 2 sumber (minggu ini + depan) + fallback hari kerja saat weekend, min 10 event
   - Sentimen: threshold ±1, rekomendasi_pasar, analisis indeks diperluas, min 30 berita
   - Geopolitik: keyword diperluas ke pasar AS, fallback US market news, min 30 berita
-  - Terjemahan: judul artikel ke Bahasa Indonesia via MyMemory API (gratis)
   - Lebih banyak berita: max 15 per feed (sebelumnya 8), 12 feed US
 """
 
@@ -51,6 +56,13 @@ try:
     HAS_BS4 = True
 except ImportError:
     HAS_BS4 = False
+
+try:
+    from deep_translator import GoogleTranslator as _GTrans
+    HAS_GTRANS = True
+except ImportError:
+    HAS_GTRANS = False
+    # Jalankan: python -m pip install deep-translator
 
 # ─── PATHS ────────────────────────────────────────────────────────────────────
 BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
@@ -272,22 +284,40 @@ def translate_event_name(title):
             return id_name
     return title
 
-# ─── TERJEMAHAN OTOMATIS (MyMemory API, gratis 5000 kata/hari) ───────────────
+# ─── TERJEMAHAN OTOMATIS (Google Translate via deep-translator, fallback MyMemory) ────
 _TRANS_CACHE: dict = {}
 
-def translate_to_id(text: str, timeout: int = 6) -> str:
-    """Terjemahkan teks Inggris ke Bahasa Indonesia via MyMemory API."""
+def translate_to_id(text: str) -> str:
+    """Terjemahkan teks ke Bahasa Indonesia.
+
+    Urutan prioritas:
+      1. deep-translator / Google Translate (tanpa batas kuota harian)
+      2. MyMemory API sebagai fallback (5000 kata/hari)
+    Hasil di-cache agar teks yang sama tidak di-request dua kali.
+    """
     if not text or len(text.strip()) < 5:
         return text
-    key = text[:120]
+    key = text[:150]
     if key in _TRANS_CACHE:
         return _TRANS_CACHE[key]
+
+    # Prioritas 1: Google Translate via deep-translator
+    if HAS_GTRANS:
+        try:
+            result = _GTrans(source='auto', target='id').translate(text[:500])
+            if result and len(result) > 3:
+                _TRANS_CACHE[key] = result
+                return result
+        except Exception as e:
+            log.debug(f'deep-translator gagal: {e}')
+
+    # Fallback: MyMemory API
     try:
         r = requests.get(
             'https://api.mymemory.translated.net/get',
             params={'q': text[:450], 'langpair': 'en|id'},
-            timeout=timeout,
-            headers={'User-Agent': 'StockDigest/2.1'},
+            timeout=6,
+            headers={'User-Agent': 'StockDigest/2.2'},
         )
         data = r.json()
         result = data.get('responseData', {}).get('translatedText', '')
@@ -297,47 +327,50 @@ def translate_to_id(text: str, timeout: int = 6) -> str:
             return result
     except Exception:
         pass
+
     _TRANS_CACHE[key] = text
     return text
 
-def translate_articles(articles: list, max_count: int = 40, max_desc_count: int = 20) -> list:
-    """Tambahkan field judul_id dan ringkasan_id (terjemahan Indonesia) ke setiap artikel."""
+def translate_articles(articles: list) -> list:
+    """Terjemahkan judul dan ringkasan semua artikel US ke Bahasa Indonesia.
+
+    Menambahkan field judul_id dan ringkasan_id ke setiap artikel.
+    Artikel Indonesia (asal='ID') langsung disalin tanpa terjemahan.
+    """
     if not TRANSLATE_ENABLED:
         for a in articles:
             a['judul_id'] = a.get('judul', '')
             a['ringkasan_id'] = a.get('ringkasan', '')
         return articles
 
-    log.info(f'── Menerjemahkan judul artikel (maks {max_count}) ──')
-    title_count = 0
+    engine = 'Google Translate (deep-translator)' if HAS_GTRANS else 'MyMemory API (fallback)'
+    us_articles = [a for a in articles if a.get('asal') == 'US']
+
+    # Artikel Indonesia tidak perlu diterjemahkan
     for a in articles:
-        judul = a.get('judul', '')
-        if title_count < max_count and a.get('asal') == 'US' and judul:
-            a['judul_id'] = translate_to_id(judul)
-            title_count += 1
-            time.sleep(0.25)
-        else:
-            a['judul_id'] = judul
-    for a in articles:
-        if 'judul_id' not in a:
+        if a.get('asal') != 'US':
             a['judul_id'] = a.get('judul', '')
-    log.info(f'  Terjemahan judul selesai: {title_count} judul')
-
-    log.info(f'── Menerjemahkan deskripsi artikel (maks {max_desc_count}) ──')
-    desc_count = 0
-    for a in articles:
-        ringkasan = a.get('ringkasan', '')
-        if desc_count < max_desc_count and a.get('asal') == 'US' and ringkasan and len(ringkasan) > 10:
-            a['ringkasan_id'] = translate_to_id(ringkasan)
-            desc_count += 1
-            time.sleep(0.25)
-        else:
-            a['ringkasan_id'] = ringkasan
-    for a in articles:
-        if 'ringkasan_id' not in a:
             a['ringkasan_id'] = a.get('ringkasan', '')
-    log.info(f'  Terjemahan deskripsi selesai: {desc_count} deskripsi')
 
+    log.info(f'── Menerjemahkan {len(us_articles)} artikel US via {engine} ──')
+    for i, a in enumerate(us_articles, 1):
+        judul    = a.get('judul', '')
+        ringkasan = a.get('ringkasan', '')
+
+        a['judul_id']     = translate_to_id(judul)    if judul                      else ''
+        time.sleep(0.12)
+        a['ringkasan_id'] = translate_to_id(ringkasan) if ringkasan and len(ringkasan) > 5 else ringkasan
+        time.sleep(0.12)
+
+        if i % 10 == 0 or i == len(us_articles):
+            log.info(f'  {i}/{len(us_articles)} artikel diterjemahkan')
+
+    # Pastikan semua artikel memiliki kedua field
+    for a in articles:
+        a.setdefault('judul_id', a.get('judul', ''))
+        a.setdefault('ringkasan_id', a.get('ringkasan', ''))
+
+    log.info(f'  Selesai — {len(us_articles)} judul + {len(us_articles)} deskripsi')
     return articles
 
 # ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -1091,7 +1124,7 @@ def send_email(cfg, subject, html_body):
 # ─── MAIN ORCHESTRATOR ────────────────────────────────────────────────────────
 def run_digest():
     log.info('═' * 64)
-    log.info(f'STOCK DIGEST v2.1 MULAI — {fmt_wib()}')
+    log.info(f'STOCK DIGEST v2.2 MULAI — {fmt_wib()}')
     log.info('═' * 64)
 
     cfg = load_config()
@@ -1104,8 +1137,8 @@ def run_digest():
     if len(articles) < 5:
         log.warning(f'Hanya {len(articles)} berita — periksa koneksi internet')
 
-    # 2. Terjemahkan judul artikel ke Bahasa Indonesia
-    translate_articles(articles, max_count=40)
+    # 2. Terjemahkan judul + deskripsi semua artikel US ke Bahasa Indonesia
+    translate_articles(articles)
 
     # 3. Ambil kalender ekonomi
     cal_events, weekend_mode, cal_note = fetch_economic_calendar()

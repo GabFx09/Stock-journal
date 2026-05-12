@@ -59,6 +59,7 @@ jobs:
             echo "Tidak ada perubahan data, skip commit."
           else
             git commit -m "chore: stock digest $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git pull --rebase
             git push
           fi
 

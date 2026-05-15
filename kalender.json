@@ -1,12 +1,51 @@
 {
-  "tanggal": "2026-05-14",
-  "hari_ini_label": "Kamis, 14 Mei 2026",
-  "jam_update": "2026-05-14 07:01 WIB",
-  "total_event": 11,
-  "event_tinggi": 2,
-  "weekend_mode": false,
-  "catatan": "",
+  "tanggal": "2026-05-15",
+  "hari_ini_label": "Jumat, 15 Mei 2026",
+  "jam_update": "2026-05-15 07:02 WIB",
+  "total_event": 21,
+  "event_tinggi": 5,
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Empire State Manufacturing Index",
+      "event_id": "Indeks Manufaktur Empire State",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "7.3",
+      "sebelumnya": "11.0",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Capacity Utilization Rate",
+      "event_id": "Kapasitas Utilisasi",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "75.8%",
+      "sebelumnya": "75.7%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Industrial Production m/m",
+      "event_id": "Produksi Industri",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.3%",
+      "sebelumnya": "-0.5%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Core Retail Sales m/m",
@@ -18,7 +57,7 @@
       "perkiraan": "0.7%",
       "sebelumnya": "1.9%",
       "dampak_saham": "Penjualan retail kuat → konsumsi tinggi → positif saham consumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +70,7 @@
       "perkiraan": "0.5%",
       "sebelumnya": "1.7%",
       "dampak_saham": "Penjualan retail kuat → konsumsi tinggi → positif saham consumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +83,7 @@
       "perkiraan": "205K",
       "sebelumnya": "200K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +96,7 @@
       "perkiraan": "1.0%",
       "sebelumnya": "0.8%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +109,7 @@
       "perkiraan": "0.8%",
       "sebelumnya": "0.4%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -83,7 +122,7 @@
       "perkiraan": "—",
       "sebelumnya": "4.26%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -96,7 +135,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -109,7 +148,7 @@
       "perkiraan": "86B",
       "sebelumnya": "63B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -122,7 +161,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -135,7 +174,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
     },
     {
       "waktu": "— ET",
@@ -148,7 +187,98 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-14)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core PPI m/m",
+      "event_id": "Indeks Harga Produsen (PPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.3%",
+      "sebelumnya": "0.1%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "PPI m/m",
+      "event_id": "Indeks Harga Produsen (PPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.5%",
+      "sebelumnya": "0.5%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-2.0M",
+      "sebelumnya": "-2.3M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Collins Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "30-y Bond Auction",
+      "event_id": "30-y Bond Auction",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "4.88|2.4",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Kashkari Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-05-13)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Fed Chair Nomination Vote",
+      "event_id": "Pidato Ketua Federal Reserve",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "Pass",
+      "sebelumnya": "—",
+      "dampak_saham": "Nada dovish → pasar naik; nada hawkish → pasar turun",
+      "tanggal_label": "Ringkasan (2026-05-13)"
     }
   ]
 }

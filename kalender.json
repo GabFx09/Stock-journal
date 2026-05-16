@@ -1,9 +1,9 @@
 {
-  "tanggal": "2026-05-15",
-  "hari_ini_label": "Jumat, 15 Mei 2026",
-  "jam_update": "2026-05-15 07:02 WIB",
-  "total_event": 21,
-  "event_tinggi": 5,
+  "tanggal": "2026-05-16",
+  "hari_ini_label": "Sabtu, 16 Mei 2026",
+  "jam_update": "2026-05-16 07:02 WIB",
+  "total_event": 20,
+  "event_tinggi": 4,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
@@ -18,7 +18,7 @@
       "perkiraan": "7.3",
       "sebelumnya": "11.0",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-15)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "75.8%",
       "sebelumnya": "75.7%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-15)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "0.3%",
       "sebelumnya": "-0.5%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-15)"
     },
     {
       "waktu": "— ET",
@@ -265,19 +265,6 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Ringkasan (2026-05-13)"
-    },
-    {
-      "waktu": "— ET",
-      "event": "Fed Chair Nomination Vote",
-      "event_id": "Pidato Ketua Federal Reserve",
-      "dampak": "Tinggi",
-      "dampak_en": "High",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "Pass",
-      "sebelumnya": "—",
-      "dampak_saham": "Nada dovish → pasar naik; nada hawkish → pasar turun",
       "tanggal_label": "Ringkasan (2026-05-13)"
     }
   ]

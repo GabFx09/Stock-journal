@@ -1,0 +1,42 @@
+name: Deploy ke GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Siapkan folder deploy
+        run: |
+          mkdir -p _deploy
+          cp StockJournal_Pro_1.html _deploy/index.html
+          cp manifest.json           _deploy/
+          cp sw.js                   _deploy/
+          cp icon-192.png            _deploy/
+          cp icon-512.png            _deploy/
+          cp _headers                _deploy/
+          [ -f stock_analysis_data.js ] && cp stock_analysis_data.js _deploy/ || true
+          [ -f kalender.json ]          && cp kalender.json          _deploy/ || true
+          [ -f sentimen.json ]          && cp sentimen.json          _deploy/ || true
+          [ -f geopolitik.json ]        && cp geopolitik.json        _deploy/ || true
+          ls -lh _deploy/
+
+      - name: Deploy ke GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_deploy
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'

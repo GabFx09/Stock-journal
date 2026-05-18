@@ -69,6 +69,11 @@ jobs:
           mkdir -p _deploy
           cp StockJournal_Pro_1.html _deploy/index.html
           cp stock_analysis_data.js  _deploy/
+          cp manifest.json           _deploy/
+          cp sw.js                   _deploy/
+          cp icon-192.png            _deploy/
+          cp icon-512.png            _deploy/
+          cp _headers                _deploy/
           for f in kalender.json sentimen.json geopolitik.json; do
             [ -f "$f" ] && cp "$f" _deploy/ || true
           done

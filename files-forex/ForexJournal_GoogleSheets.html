@@ -1587,7 +1587,7 @@ function renderKalender() {
             <div style="color:var(--mut);font-size:11px">${upcoming.length} event belum memiliki data aktual</div>
           </div>
         </div>
-        ${buildDayTables(upcoming, '#3b82f6')}
+        ${buildDayTables(upcoming, '#3b82f6', true)}
       </div>`
     : `<div style="text-align:center;padding:18px;color:var(--mut);font-size:13px;
           border:1px dashed rgba(59,130,246,0.35);border-radius:8px;margin-bottom:20px">

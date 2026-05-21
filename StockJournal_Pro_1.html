@@ -623,11 +623,20 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           <div class="fg"><label class="lb">Target Harga</label><input type="number" placeholder="10000" id="sl-target"></div>
           <div class="fg"><label class="lb">Stop Loss</label><input type="number" placeholder="7500" id="sl-sl"></div>
         </div>
-        <div class="fr fr2">
+        <div class="fr fr3">
           <div class="fg"><label class="lb">Exchange</label>
             <select id="sl-exch"><option>NYSE</option><option>NASDAQ</option><option>IDX (BEI)</option><option>SGX</option><option>HKEX</option><option>LSE</option></select>
           </div>
           <div class="fg"><label class="lb">P/E Ratio saat beli</label><input type="number" step="0.1" placeholder="12.5" id="sl-pe"></div>
+          <div class="fg"><label class="lb">Status Transaksi</label>
+            <select id="sl-status">
+              <option value="auto">🔄 Auto (sistem hitung)</option>
+              <option value="PENDING">⏳ PENDING — masih holding</option>
+              <option value="WIN">✅ WIN — sudah profit</option>
+              <option value="LOSE">❌ LOSE — sudah loss</option>
+              <option value="HOLD">📦 HOLD — hold jangka panjang</option>
+            </select>
+          </div>
         </div>
         <div class="fg"><label class="lb">Tesis / Alasan Investasi</label><textarea placeholder="Kenapa beli saham ini? Katalis apa? Kapan target exit?..." id="sl-thesis"></textarea></div>
         <div class="fg">
@@ -642,19 +651,23 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
       </div>
       <!-- HISTORY TABLE -->
       <div class="card">
-        <div class="fb" style="margin-bottom:12px">
+        <div class="fb" style="margin-bottom:10px">
           <div class="ct" style="margin-bottom:0">Riwayat Transaksi</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="text" id="sl-search" placeholder="Cari ticker..." style="width:130px;padding:5px 9px;font-size:11px" oninput="renderStockLog()">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="sl-search" placeholder="Cari ticker..." style="width:120px;padding:5px 9px;font-size:11px" oninput="renderStockLog()">
             <select id="sl-filter" onchange="renderStockLog()" style="font-size:11px;padding:5px 9px;width:auto">
-              <option value="all">Semua Aksi</option><option value="BUY">BUY</option><option value="SELL">SELL</option><option value="DCA">DCA</option>
+              <option value="all">Semua</option>
+              <option value="BUY">BUY</option><option value="SELL">SELL</option><option value="DCA">DCA</option><option value="DIVIDEN">Dividen</option>
+              <option value="WIN">✅ WIN</option><option value="LOSE">❌ LOSE</option><option value="PENDING">⏳ PENDING</option><option value="HOLD">📦 HOLD</option>
             </select>
             <button class="btn br" style="font-size:11px;padding:4px 10px" onclick="clearAllStocks()">Hapus Semua</button>
           </div>
         </div>
+        <!-- SUMMARY STRIP -->
+        <div id="sl-summary"></div>
         <div style="overflow-x:auto">
           <table class="tbl">
-            <thead><tr><th>Tgl</th><th>Ticker</th><th>Perusahaan</th><th>Aksi</th><th>Harga</th><th>Lot/Lembar</th><th>Total</th><th>Sektor</th><th>Horizon</th><th>P/E</th><th>📸</th><th>📝</th><th>Del</th></tr></thead>
+            <thead><tr><th>Tgl</th><th>Ticker</th><th>Aksi</th><th>Status</th><th>Harga</th><th>Lot</th><th>Total Modal</th><th>P&amp;L</th><th>Return</th><th>Durasi</th><th>Sektor</th><th>Horizon</th><th>📸</th><th>📝</th><th>Del</th></tr></thead>
             <tbody id="sl-body"></tbody>
           </table>
         </div>
@@ -1035,7 +1048,8 @@ function addStock(){
     sector:$('sl-sector').value,horizon:$('sl-horizon').value,
     target:parseFloat($('sl-target').value)||0,sl:parseFloat($('sl-sl').value)||0,
     exchange:$('sl-exch').value,pe:parseFloat($('sl-pe').value)||0,
-    thesis:$('sl-thesis').value,sslink:String($('sl-sslink')?$('sl-sslink').value||'':'')
+    thesis:$('sl-thesis').value,sslink:String($('sl-sslink')?$('sl-sslink').value||'':''),
+    status:$('sl-status')?$('sl-status').value:'auto'
   };
   stocks.unshift(s);save();renderStockLog();renderPortfolio();updateDash();clearSLForm();
   toast('✅ Transaksi '+s.action+' '+ticker+' tersimpan!');
@@ -1052,32 +1066,128 @@ function addStock(){
 
 function deleteStock(id){stocks=stocks.filter(s=>s.id!==id);save();renderStockLog();renderPortfolio();updateDash();if(GS_ON)gasPost({action:'deleteStock',id}).catch(()=>{});}
 function clearAllStocks(){if(!stocks.length)return;if(!confirm('Hapus SEMUA riwayat transaksi?'))return;stocks=[];save();renderStockLog();renderPortfolio();updateDash();}
-function clearSLForm(){['sl-ticker','sl-name','sl-price','sl-qty','sl-total','sl-fee','sl-target','sl-sl','sl-pe','sl-thesis'].forEach(id=>{const e=$(id);if(e)e.value='';});$('sl-date').value=today();const ssl=$('sl-sslink');if(ssl)ssl.value='';}
+function clearSLForm(){['sl-ticker','sl-name','sl-price','sl-qty','sl-total','sl-fee','sl-target','sl-sl','sl-pe','sl-thesis'].forEach(id=>{const e=$(id);if(e)e.value='';});$('sl-date').value=today();const ssl=$('sl-sslink');if(ssl)ssl.value='';const ss=$('sl-status');if(ss)ss.value='auto';}
+
+// ── Helpers P&L & Status ─────────────────────────────────────────
+function calcTxPnL(s){
+  if(s.action==='SELL'){
+    const buys=stocks.filter(b=>(b.action==='BUY'||b.action==='DCA')&&b.ticker===s.ticker);
+    const tQty=buys.reduce((a,b)=>a+Number(b.qty),0);
+    const tCost=buys.reduce((a,b)=>a+Number(b.total),0);
+    const avgCost=tQty>0?tCost/tQty:Number(s.price);
+    const pnl=(Number(s.price)-avgCost)*Number(s.qty)-Number(s.fee||0);
+    const pct=avgCost>0?(Number(s.price)-avgCost)/avgCost*100:0;
+    return{pnl,pct,avgCost};
+  }
+  if(s.action==='DIVIDEN')return{pnl:Number(s.total||0),pct:null,avgCost:0};
+  if(s.target&&s.price){
+    const pct=(Number(s.target)-Number(s.price))/Number(s.price)*100;
+    return{pnl:null,pct,avgCost:Number(s.price)};
+  }
+  return{pnl:null,pct:null,avgCost:Number(s.price||0)};
+}
+function getTxStatus(s){
+  if(s.status&&s.status!=='auto')return s.status;
+  if(s.action==='DIVIDEN')return'WIN';
+  if(s.action==='SELL'){const{pnl}=calcTxPnL(s);return pnl>=0?'WIN':'LOSE';}
+  return'PENDING';
+}
+function setSlFilter(val){const el=$('sl-filter');if(el){el.value=val;renderStockLog();}}
 
 function renderStockLog(){
   const tb=$('sl-body');if(!tb)return;
   const flt=$('sl-filter')?$('sl-filter').value:'all';
   const srch=$('sl-search')?$('sl-search').value.toLowerCase():'';
-  const list=stocks.filter(s=>(flt==='all'||s.action===flt)&&(!srch||s.ticker.toLowerCase().includes(srch)||s.name.toLowerCase().includes(srch)));
-  if(!list.length){tb.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--mut)">Belum ada transaksi. Tambahkan di form atas.</td></tr>`;return;}
+  const statusFilters=['WIN','LOSE','PENDING','HOLD','CLOSED'];
+  const list=stocks.filter(s=>{
+    const mS=!srch||s.ticker.toLowerCase().includes(srch)||(s.name||'').toLowerCase().includes(srch);
+    if(!mS)return false;
+    if(flt==='all')return true;
+    if(statusFilters.includes(flt))return getTxStatus(s)===flt;
+    return s.action===flt;
+  });
+
+  // ── Summary strip ──
+  const total=stocks.length;
+  const wins=stocks.filter(s=>getTxStatus(s)==='WIN').length;
+  const loses=stocks.filter(s=>getTxStatus(s)==='LOSE').length;
+  const pending=stocks.filter(s=>getTxStatus(s)==='PENDING').length;
+  const winRate=(wins+loses)>0?(wins/(wins+loses)*100).toFixed(0):0;
+  const totalPnL=stocks.filter(s=>s.action==='SELL'||s.action==='DIVIDEN').reduce((acc,s)=>acc+(calcTxPnL(s).pnl||0),0);
+  const pnlClr=totalPnL>=0?'var(--green)':'var(--red)';
+  const pnlBg=totalPnL>=0?'rgba(16,185,129,.08)':'rgba(244,63,94,.08)';
+  const pnlBd=totalPnL>=0?'rgba(16,185,129,.2)':'rgba(244,63,94,.2)';
+  const sm=$('sl-summary');
+  if(sm)sm.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px">
+    <div style="background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:9px;padding:8px 14px;text-align:center;min-width:62px">
+      <div style="font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">Total</div>
+      <div style="font-size:22px;font-weight:700;color:var(--txt);font-family:var(--mono)">${total}</div>
+    </div>
+    <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.28);border-radius:9px;padding:8px 14px;text-align:center;min-width:62px;cursor:pointer" onclick="setSlFilter('WIN')" title="Klik untuk filter WIN">
+      <div style="font-size:9px;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">✅ WIN</div>
+      <div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--mono)">${wins}</div>
+    </div>
+    <div style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.28);border-radius:9px;padding:8px 14px;text-align:center;min-width:62px;cursor:pointer" onclick="setSlFilter('LOSE')" title="Klik untuk filter LOSE">
+      <div style="font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">❌ LOSE</div>
+      <div style="font-size:22px;font-weight:700;color:var(--red);font-family:var(--mono)">${loses}</div>
+    </div>
+    <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.28);border-radius:9px;padding:8px 14px;text-align:center;min-width:72px;cursor:pointer" onclick="setSlFilter('PENDING')" title="Klik untuk filter PENDING">
+      <div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">⏳ PENDING</div>
+      <div style="font-size:22px;font-weight:700;color:var(--gold);font-family:var(--mono)">${pending}</div>
+    </div>
+    <div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.22);border-radius:9px;padding:8px 14px;text-align:center;min-width:82px">
+      <div style="font-size:9px;color:var(--blue);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">🎯 Win Rate</div>
+      <div style="font-size:22px;font-weight:700;color:var(--blue);font-family:var(--mono)">${winRate}%</div>
+    </div>
+    <div style="background:${pnlBg};border:1px solid ${pnlBd};border-radius:9px;padding:8px 14px;text-align:center;flex:1;min-width:120px">
+      <div style="font-size:9px;color:${pnlClr};text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px">💰 Realized P&amp;L</div>
+      <div style="font-size:18px;font-weight:700;color:${pnlClr};font-family:var(--mono)">${totalPnL>=0?'+':''}${Math.round(totalPnL).toLocaleString('id-ID')}</div>
+    </div>
+  </div>`;
+
+  if(!list.length){tb.innerHTML=`<tr><td colspan="15" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada transaksi untuk filter ini.</td></tr>`;return;}
   const hzMap={spot:'<span class="horizon-tag hz-spot">Spot</span>',swing:'<span class="horizon-tag hz-swing">Swing</span>',invest:'<span class="horizon-tag hz-invest">Invest</span>',long:'<span class="horizon-tag hz-long">Long</span>'};
   const actColor={BUY:'var(--green)',SELL:'var(--red)',DCA:'var(--blue)',DIVIDEN:'var(--gold)'};
+  const sBadge={
+    WIN:'<span style="background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">✅ WIN</span>',
+    LOSE:'<span style="background:rgba(244,63,94,.15);color:var(--red);border:1px solid rgba(244,63,94,.3);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">❌ LOSE</span>',
+    PENDING:'<span style="background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">⏳ PENDING</span>',
+    HOLD:'<span style="background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">📦 HOLD</span>',
+    CLOSED:'<span style="background:rgba(255,255,255,.06);color:var(--sub);border:1px solid var(--bdr);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">🔒 CLOSED</span>'
+  };
   tb.innerHTML=list.map(s=>{
     const sslink=String(s.sslink||'').trim();
     const hasTh=s.thesis&&s.thesis.trim();
-    const ssCell=sslink?'<a href="'+sslink+'" target="_blank" onclick="event.stopPropagation()" title="Buka screenshot" style="color:var(--green);font-size:16px;text-decoration:none">🔗</a>':'—';
-    const noteRow=hasTh?`<tr id="th-${s.id}" style="display:none"><td colspan="13" style="padding:0 10px 10px"><div style="background:#06101f;border:1px solid var(--bdr);border-radius:7px;padding:10px 13px;font-size:11px;color:var(--sub);line-height:1.7;white-space:pre-wrap"><b style="color:var(--mut);font-size:10px">📝 TESIS / ALASAN:</b><br>${s.thesis}</div></td></tr>`:'';
+    const ssCell=sslink?'<a href="'+sslink+'" target="_blank" onclick="event.stopPropagation()" title="Buka screenshot" style="color:var(--green);font-size:15px;text-decoration:none">🔗</a>':'—';
+    const status=getTxStatus(s);
+    const{pnl,pct}=calcTxPnL(s);
+    // P&L cell
+    let pnlCell='—';
+    if(pnl!==null){const pc=pnl>=0?'var(--green)':'var(--red)';pnlCell=`<span style="color:${pc};font-family:var(--mono);font-size:11px;font-weight:600">${pnl>=0?'+':''}${Math.round(pnl).toLocaleString('id-ID')}</span>`;}
+    // % Return cell
+    let pctCell='—';
+    if(pct!==null){
+      const pc=pct>=0?'var(--green)':'var(--red)';
+      if(s.action==='SELL'||s.action==='DIVIDEN'){pctCell=`<span style="color:${pc};font-family:var(--mono);font-size:11px">${pct>=0?'+':''}${pct.toFixed(2)}%</span>`;}
+      else{pctCell=`<span style="color:var(--sub);font-family:var(--mono);font-size:10px" title="Potensi ke target">→${pct.toFixed(1)}%</span>`;}
+    }
+    // Duration
+    let durCell='—';
+    if(s.date){const days=Math.floor((Date.now()-new Date(s.date))/86400000);durCell=`<span style="color:var(--sub);font-size:10px">${days}h</span>`;}
+    const noteRow=hasTh?`<tr id="th-${s.id}" style="display:none"><td colspan="15" style="padding:0 10px 10px"><div style="background:#06101f;border:1px solid var(--bdr);border-radius:7px;padding:10px 13px;font-size:11px;color:var(--sub);line-height:1.7;white-space:pre-wrap"><b style="color:var(--mut);font-size:10px">📝 TESIS / ALASAN:</b><br>${s.thesis}</div></td></tr>`:'';
     return `<tr style="cursor:${hasTh?'pointer':'default'}" onclick="${hasTh?`toggleTh(${s.id})`:''}">
-      <td>${s.date||'—'}</td>
+      <td style="white-space:nowrap;font-size:11px">${s.date||'—'}</td>
       <td class="ts"><span class="ticker-badge">${s.ticker}</span></td>
-      <td style="color:var(--txt);max-width:120px;overflow:hidden;text-overflow:ellipsis">${s.name||'—'}</td>
       <td style="color:${actColor[s.action]||'var(--sub)'};font-weight:700;font-size:11px">${s.action}</td>
+      <td>${sBadge[status]||sBadge['PENDING']}</td>
       <td style="font-family:var(--mono)">${s.price?Number(s.price).toLocaleString('id-ID'):'—'}</td>
       <td style="font-family:var(--mono)">${s.qty?Number(s.qty).toLocaleString('id-ID'):'—'}</td>
       <td style="font-family:var(--mono);color:var(--gold)">${s.total?Number(s.total).toLocaleString('id-ID'):'—'}</td>
+      <td>${pnlCell}</td>
+      <td>${pctCell}</td>
+      <td>${durCell}</td>
       <td><span class="sector-tag" style="background:rgba(59,130,246,.1);color:var(--blue);font-size:10px">${s.sector||'—'}</span></td>
       <td>${hzMap[s.horizon]||'—'}</td>
-      <td style="font-family:var(--mono)">${s.pe?s.pe+'x':'—'}</td>
       <td>${ssCell}</td>
       <td style="text-align:center;font-size:13px;color:var(--gold)">${hasTh?'📝':''}</td>
       <td><button class="bsm" onclick="event.stopPropagation();deleteStock(${s.id})">✕</button></td>

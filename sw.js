@@ -1,20 +1,16 @@
-const CACHE = 'sj-stock-v3';
+const CACHE = 'sj-stock-v5';
 
-const CORE = [
-  './',
-  'index.html',
+// Aset statis yang boleh di-cache (bukan HTML utama)
+const STATIC = [
   'manifest.json',
   'icon-192.png',
   'icon-512.png'
 ];
 
-// File data dinamis — selalu ambil dari network, fallback ke cache
-const DYNAMIC = ['stock_analysis_data.js', 'kalender.json', 'sentimen.json', 'geopolitik.json'];
-
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(CORE))
+      .then(c => c.addAll(STATIC))
       .then(() => self.skipWaiting())
   );
 });
@@ -33,10 +29,12 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
-  const isDynamic = DYNAMIC.some(f => url.pathname.endsWith(f));
+  const isNavigate = e.request.mode === 'navigate';
+  const isHTML = url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
-  if (isDynamic) {
-    // Network-first: data harian harus selalu fresh
+  // index.html & navigasi: SELALU ambil dari network dulu
+  // → update langsung terlihat, tidak perlu cache-bust manual
+  if (isNavigate || isHTML) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
@@ -50,7 +48,7 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first untuk aset statis; navigation fallback ke HTML utama
+  // Aset statis (icon, manifest): cache-first, fallback network
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
@@ -59,10 +57,6 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE).then(c => c.put(e.request, res.clone()));
         }
         return res;
-      }).catch(() => {
-        if (e.request.mode === 'navigate') {
-          return caches.match('index.html');
-        }
       });
     })
   );

@@ -1094,6 +1094,29 @@ function getTxStatus(s){
 }
 function setSlFilter(val){const el=$('sl-filter');if(el){el.value=val;renderStockLog();}}
 
+function changeStatus(id,val){
+  const s=stocks.find(x=>x.id===id);
+  if(!s)return;
+  s.status=val;
+  save();renderStockLog();renderPortfolio();updateDash();
+  toast(val==='auto'?'🔄 Status dikembalikan ke auto':'✅ Status diubah ke '+val);
+}
+function statusSelect(s,status){
+  const cfg={
+    WIN:['rgba(16,185,129,.18)','var(--green)','rgba(16,185,129,.35)'],
+    LOSE:['rgba(244,63,94,.18)','var(--red)','rgba(244,63,94,.35)'],
+    PENDING:['rgba(245,158,11,.18)','var(--gold)','rgba(245,158,11,.35)'],
+    HOLD:['rgba(59,130,246,.18)','var(--blue)','rgba(59,130,246,.35)'],
+    CLOSED:['rgba(255,255,255,.07)','var(--sub)','rgba(255,255,255,.12)'],
+  };
+  const[bg,col,bd]=cfg[status]||cfg['PENDING'];
+  const cur=s.status||'auto';
+  const opts=[['auto','🔄 Auto'],['PENDING','⏳ PENDING'],['WIN','✅ WIN'],['LOSE','❌ LOSE'],['HOLD','📦 HOLD'],['CLOSED','🔒 CLOSED']]
+    .map(([v,l])=>`<option value="${v}"${cur===v?' selected':''}>${l}</option>`).join('');
+  return `<select onchange="changeStatus(${s.id},this.value)" onclick="event.stopPropagation()" title="Klik untuk ganti status"
+    style="background:${bg};color:${col};border:1px solid ${bd};border-radius:5px;padding:2px 5px;font-size:10px;font-weight:700;cursor:pointer;max-width:115px;outline:none">${opts}</select>`;
+}
+
 function renderStockLog(){
   const tb=$('sl-body');if(!tb)return;
   const flt=$('sl-filter')?$('sl-filter').value:'all';
@@ -1179,7 +1202,7 @@ function renderStockLog(){
       <td style="white-space:nowrap;font-size:11px">${s.date||'—'}</td>
       <td class="ts"><span class="ticker-badge">${s.ticker}</span></td>
       <td style="color:${actColor[s.action]||'var(--sub)'};font-weight:700;font-size:11px">${s.action}</td>
-      <td>${sBadge[status]||sBadge['PENDING']}</td>
+      <td>${statusSelect(s,status)}</td>
       <td style="font-family:var(--mono)">${s.price?Number(s.price).toLocaleString('id-ID'):'—'}</td>
       <td style="font-family:var(--mono)">${s.qty?Number(s.qty).toLocaleString('id-ID'):'—'}</td>
       <td style="font-family:var(--mono);color:var(--gold)">${s.total?Number(s.total).toLocaleString('id-ID'):'—'}</td>

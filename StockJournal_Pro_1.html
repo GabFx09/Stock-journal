@@ -600,7 +600,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
         <div class="fr fr4">
           <div class="fg"><label class="lb">Harga (Rp/$)</label><input type="number" placeholder="8500" id="sl-price"></div>
           <div class="fg"><label class="lb">Jumlah Lot/Lembar</label><input type="number" placeholder="10" id="sl-qty"></div>
-          <div class="fg"><label class="lb">Total Nilai</label><input type="number" placeholder="850000" id="sl-total" readonly style="color:var(--sub)"></div>
+          <div class="fg"><label class="lb">Total Nilai (Rp) <span style="color:var(--mut);font-weight:400">— isi manual</span></label><input type="number" placeholder="850000" id="sl-total" oninput="slTotalManual=true" style="color:var(--txt)"></div>
           <div class="fg"><label class="lb">Fee/Komisi</label><input type="number" placeholder="0" id="sl-fee"></div>
         </div>
         <div class="fr fr4">
@@ -644,9 +644,12 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
           <input type="text" id="sl-sslink" placeholder="https://imgur.com/xxx atau link chart lainnya...">
           <div style="font-size:10px;color:var(--mut);margin-top:3px">Upload ke <a href="https://imgur.com" target="_blank" style="color:var(--green)">Imgur</a> atau <a href="https://drive.google.com" target="_blank" style="color:var(--green)">Google Drive</a> → paste link di sini · bisa dibuka dari komputer manapun</div>
         </div>
+        <div id="sl-edit-banner" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--gold);margin-bottom:10px">
+          ✏️ <b>Mode Edit</b> — <span id="sl-edit-info"></span> · perubahan akan menimpa data lama
+        </div>
         <div class="fe">
-          <button class="btn bh" onclick="clearSLForm()">Reset</button>
-          <button class="btn bg" onclick="addStock()">💾 Simpan Transaksi</button>
+          <button class="btn bh" onclick="clearSLForm()">Batal</button>
+          <button class="btn bg" id="sl-save-btn" onclick="addStock()">💾 Simpan Transaksi</button>
         </div>
       </div>
       <!-- HISTORY TABLE -->
@@ -1035,15 +1038,18 @@ async function connectGS(){GS_URL=$('gs-inp').value.trim();lsSet('sj_gs_url',GS_
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLB();});
 
 // ── STOCK LOG ────────────────────────────────────────────────────
+let editingId = null;
+let slTotalManual = false;
+
 function addStock(){
   const ticker=$('sl-ticker').value.trim().toUpperCase();
   if(!ticker){toast('❌ Ticker tidak boleh kosong');return;}
   const qty=parseFloat($('sl-qty').value)||0;
   const price=parseFloat($('sl-price').value)||0;
-  const s={
-    id:Date.now(),date:$('sl-date').value,ticker,name:$('sl-name').value,
-    action:$('sl-action').value,price,qty,
-    total:parseFloat($('sl-total').value)||(price*qty),
+  const total=parseFloat($('sl-total').value)||(price*qty);
+  const data={
+    date:$('sl-date').value,ticker,name:$('sl-name').value,
+    action:$('sl-action').value,price,qty,total,
     fee:parseFloat($('sl-fee').value)||0,
     sector:$('sl-sector').value,horizon:$('sl-horizon').value,
     target:parseFloat($('sl-target').value)||0,sl:parseFloat($('sl-sl').value)||0,
@@ -1051,22 +1057,67 @@ function addStock(){
     thesis:$('sl-thesis').value,sslink:String($('sl-sslink')?$('sl-sslink').value||'':''),
     status:$('sl-status')?$('sl-status').value:'auto'
   };
-  stocks.unshift(s);save();renderStockLog();renderPortfolio();updateDash();clearSLForm();
-  toast('✅ Transaksi '+s.action+' '+ticker+' tersimpan!');
-  if(GS_ON)gasPost({action:'saveStock',stock:s}).then(()=>setSync('ok','✅ Tersimpan di Sheets')).catch(()=>setSync('err','⚠️ Tersimpan lokal saja'));
+  if(editingId){
+    const idx=stocks.findIndex(s=>s.id===editingId);
+    if(idx>=0){stocks[idx]={...stocks[idx],...data};toast('✏️ Transaksi '+data.action+' '+ticker+' diperbarui!');}
+  } else {
+    stocks.unshift({id:Date.now(),...data});
+    toast('✅ Transaksi '+data.action+' '+ticker+' tersimpan!');
+    if(GS_ON)gasPost({action:'saveStock',stock:{id:Date.now(),...data}}).then(()=>setSync('ok','✅ Tersimpan di Sheets')).catch(()=>setSync('err','⚠️ Tersimpan lokal saja'));
+  }
+  save();renderStockLog();renderPortfolio();updateDash();clearSLForm();
 }
 
-// Auto-calc total
+// Auto-calc total (hanya jika belum diisi manual)
+let slTotalManualFlag=false;
 ['sl-price','sl-qty'].forEach(id=>{
   const el=$(id);if(el)el.addEventListener('input',()=>{
+    if(slTotalManualFlag)return;
     const p=parseFloat($('sl-price').value)||0,q=parseFloat($('sl-qty').value)||0;
     if($('sl-total'))$('sl-total').value=p*q?Math.round(p*q):'';
   });
 });
+document.addEventListener('DOMContentLoaded',()=>{
+  const tot=$('sl-total');
+  if(tot)tot.addEventListener('input',()=>{slTotalManualFlag=true;});
+});
 
 function deleteStock(id){stocks=stocks.filter(s=>s.id!==id);save();renderStockLog();renderPortfolio();updateDash();if(GS_ON)gasPost({action:'deleteStock',id}).catch(()=>{});}
 function clearAllStocks(){if(!stocks.length)return;if(!confirm('Hapus SEMUA riwayat transaksi?'))return;stocks=[];save();renderStockLog();renderPortfolio();updateDash();}
-function clearSLForm(){['sl-ticker','sl-name','sl-price','sl-qty','sl-total','sl-fee','sl-target','sl-sl','sl-pe','sl-thesis'].forEach(id=>{const e=$(id);if(e)e.value='';});$('sl-date').value=today();const ssl=$('sl-sslink');if(ssl)ssl.value='';const ss=$('sl-status');if(ss)ss.value='auto';}
+
+function clearSLForm(){
+  ['sl-ticker','sl-name','sl-price','sl-qty','sl-total','sl-fee','sl-target','sl-sl','sl-pe','sl-thesis'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  $('sl-date').value=today();
+  const ssl=$('sl-sslink');if(ssl)ssl.value='';
+  const ss=$('sl-status');if(ss)ss.value='auto';
+  editingId=null; slTotalManualFlag=false;
+  const banner=$('sl-edit-banner');if(banner)banner.style.display='none';
+  const btn=$('sl-save-btn');if(btn){btn.textContent='💾 Simpan Transaksi';btn.className='btn bg';}
+}
+
+function editStock(id){
+  const s=stocks.find(x=>x.id===id);if(!s)return;
+  editingId=id; slTotalManualFlag=true;
+  // Isi form
+  const set=(elId,val)=>{const e=$(elId);if(e)e.value=val||'';};
+  set('sl-date',s.date);set('sl-ticker',s.ticker);set('sl-name',s.name);
+  set('sl-price',s.price);set('sl-qty',s.qty);set('sl-total',s.total);
+  set('sl-fee',s.fee);set('sl-target',s.target);set('sl-sl',s.sl);
+  set('sl-pe',s.pe);set('sl-thesis',s.thesis);set('sl-sslink',s.sslink||'');
+  if($('sl-action'))$('sl-action').value=s.action||'BUY';
+  if($('sl-sector'))$('sl-sector').value=s.sector||'Perbankan';
+  if($('sl-horizon'))$('sl-horizon').value=s.horizon||'invest';
+  if($('sl-exch'))$('sl-exch').value=s.exchange||'IDX (BEI)';
+  if($('sl-status'))$('sl-status').value=s.status||'auto';
+  // Tampilkan banner & ubah tombol
+  const banner=$('sl-edit-banner');
+  if(banner){banner.style.display='block';$('sl-edit-info').textContent=s.ticker+' · '+s.action+' · '+s.date;}
+  const btn=$('sl-save-btn');
+  if(btn){btn.textContent='✏️ Update Transaksi';btn.className='btn by';}
+  // Scroll ke form
+  const form=document.getElementById('tab-stocklog');
+  if(form)form.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
 // ── Helpers P&L & Status ─────────────────────────────────────────
 function calcTxPnL(s){
@@ -1213,7 +1264,7 @@ function renderStockLog(){
       <td>${hzMap[s.horizon]||'—'}</td>
       <td>${ssCell}</td>
       <td style="text-align:center;font-size:13px;color:var(--gold)">${hasTh?'📝':''}</td>
-      <td><button class="bsm" onclick="event.stopPropagation();deleteStock(${s.id})">✕</button></td>
+      <td style="white-space:nowrap"><button onclick="event.stopPropagation();editStock(${s.id})" style="background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer;margin-right:3px" title="Edit transaksi">✏️</button><button class="bsm" onclick="event.stopPropagation();deleteStock(${s.id})" title="Hapus">✕</button></td>
     </tr>${noteRow}`;
   }).join('');
 }

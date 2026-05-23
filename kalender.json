@@ -1,12 +1,64 @@
 {
-  "tanggal": "2026-05-21",
-  "hari_ini_label": "Kamis, 21 Mei 2026",
-  "jam_update": "2026-05-21 07:02 WIB",
-  "total_event": 8,
-  "event_tinggi": 0,
-  "weekend_mode": false,
-  "catatan": "",
+  "tanggal": "2026-05-23",
+  "hari_ini_label": "Sabtu, 23 Mei 2026",
+  "jam_update": "2026-05-23 07:02 WIB",
+  "total_event": 15,
+  "event_tinggi": 1,
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Revised UoM Consumer Sentiment",
+      "event_id": "Sentimen Konsumen Michigan",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "48.2",
+      "sebelumnya": "48.2",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-22)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "CB Leading Index m/m",
+      "event_id": "CB Leading Index m/m",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-0.1%",
+      "sebelumnya": "-0.6%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-22)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Waller Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-05-22)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Revised UoM Inflation Expectations",
+      "event_id": "Revised UoM Inflation Expectations",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "4.5%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-22)"
+    },
     {
       "waktu": "— ET",
       "event": "Philly Fed Manufacturing Index",
@@ -18,7 +70,7 @@
       "perkiraan": "17.6",
       "sebelumnya": "26.7",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +83,7 @@
       "perkiraan": "210K",
       "sebelumnya": "211K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +96,7 @@
       "perkiraan": "1.38M",
       "sebelumnya": "1.37M",
       "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +109,7 @@
       "perkiraan": "1.42M",
       "sebelumnya": "1.50M",
       "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +122,7 @@
       "perkiraan": "53.8",
       "sebelumnya": "54.0",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -83,7 +135,7 @@
       "perkiraan": "51.1",
       "sebelumnya": "51.3",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -96,7 +148,7 @@
       "perkiraan": "96B",
       "sebelumnya": "85B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
     },
     {
       "waktu": "— ET",
@@ -109,7 +161,46 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-05-21)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Barr Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-05-20)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-2.5M",
+      "sebelumnya": "-4.3M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-05-20)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Meeting Minutes",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-05-20)"
     }
   ]
 }

@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-05-25",
-  "hari_ini_label": "Senin, 25 Mei 2026",
-  "jam_update": "2026-05-25 07:02 WIB",
+  "tanggal": "2026-05-26",
+  "hari_ini_label": "Selasa, 26 Mei 2026",
+  "jam_update": "2026-05-26 07:02 WIB",
   "total_event": 4,
   "event_tinggi": 0,
   "weekend_mode": true,
-  "catatan": "Hari ini (Senin) tidak ada event USD baru. Menampilkan event hari kerja berikutnya.",
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "Bank Holiday",
-      "event_id": "Bank Holiday",
-      "dampak": "Rendah",
-      "dampak_en": "Holiday",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "HPI m/m",
@@ -31,7 +18,7 @@
       "perkiraan": "0.1%",
       "sebelumnya": "0.0%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-05-26)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -41,10 +28,10 @@
       "dampak_en": "Low",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "1.0%",
+      "perkiraan": "0.9%",
       "sebelumnya": "0.9%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-05-26)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -57,7 +44,20 @@
       "perkiraan": "91.9",
       "sebelumnya": "92.8",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-05-26)"
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Bank Holiday",
+      "event_id": "Bank Holiday",
+      "dampak": "Rendah",
+      "dampak_en": "Holiday",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-05-25)"
     }
   ]
 }

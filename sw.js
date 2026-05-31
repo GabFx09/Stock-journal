@@ -1,4 +1,4 @@
-const CACHE = 'sj-stock-v5';
+const CACHE = 'sj-stock-v6';
 
 // Aset statis yang boleh di-cache (bukan HTML utama)
 const STATIC = [

@@ -63,6 +63,14 @@ try:
 except ImportError:
     HAS_BS4 = False
 
+try:
+    import yfinance as _yf
+    HAS_YF = True
+except ImportError:
+    _yf    = None
+    HAS_YF = False
+    logging.warning('yfinance tidak ada — fundamental N/A. Jalankan: pip install yfinance')
+
 # ─── PATHS ────────────────────────────────────────────────────────────────────
 BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE     = os.path.join(BASE_DIR, 'config_email.ini')
@@ -840,6 +848,29 @@ _YF_HEADERS = {
     'Accept':     'application/json',
 }
 
+# ── Yahoo Finance crumb session (dibutuhkan untuk v10/quoteSummary) ────────────
+_YF_SESSION = None
+_YF_CRUMB   = None
+
+def _init_yf_session() -> bool:
+    global _YF_SESSION, _YF_CRUMB
+    if _YF_SESSION and _YF_CRUMB:
+        return True
+    try:
+        s = requests.Session()
+        s.get('https://finance.yahoo.com/', headers=_YF_HEADERS, timeout=10)
+        r = s.get('https://query2.finance.yahoo.com/v1/test/getcrumb',
+                  headers=_YF_HEADERS, timeout=10)
+        crumb = r.text.strip()
+        if r.status_code == 200 and crumb and len(crumb) < 60:
+            _YF_SESSION, _YF_CRUMB = s, crumb
+            log.info(f'  YF session OK — crumb={crumb[:8]}...')
+            return True
+        log.warning(f'  YF crumb gagal: status={r.status_code} body={r.text[:80]}')
+    except Exception as e:
+        log.warning(f'  YF session init gagal: {e}')
+    return False
+
 def _fetch_yf_ohlcv(symbol: str, interval: str, range_: str) -> list:
     """Ambil data harga close dari Yahoo Finance tanpa package tambahan."""
     url = f'https://query2.finance.yahoo.com/v8/finance/chart/{symbol}'
@@ -942,6 +973,149 @@ def _fmt_price(val, exchange: str) -> str:
         return f'{val:,.0f}'
     return f'{val:.2f}'
 
+def _fetch_yf_fundamental(symbol: str) -> dict:
+    """Fetch fundamental metrics via yfinance (handles crumb otomatis)."""
+    if not HAS_YF:
+        return {}
+    try:
+        info = _yf.Ticker(symbol).info
+        if not info or info.get('quoteType') == 'NONE':
+            return {}
+        return {
+            'pe':         info.get('trailingPE'),
+            'forward_pe': info.get('forwardPE'),
+            'pb':         info.get('priceToBook'),
+            'eps':        info.get('trailingEps'),
+            'margin':     info.get('profitMargins'),
+            'op_margin':  info.get('operatingMargins'),
+            'roe':        info.get('returnOnEquity'),
+            'roa':        info.get('returnOnAssets'),
+            'rev_growth': info.get('revenueGrowth'),
+            'debt_eq':    info.get('debtToEquity'),
+            'div_yield':  info.get('dividendYield'),  # sudah dalam bentuk persen (mis. 5.89 = 5.89%)
+            'beta':       info.get('beta'),
+            'mkt_cap':    info.get('marketCap'),
+        }
+    except Exception as e:
+        log.debug(f'  YF fundamental {symbol}: {e}')
+        return {}
+
+def _score_fundamental(f: dict, exchange: str) -> tuple:
+    """
+    Skor fundamental 0-100.
+    Komponen: P/E (25) + Margin (20) + ROE (20) + Rev Growth (15) + Dividen (10) + D/E (10)
+    Returns (score, signal, assessment, display_dict)
+    """
+    if not f:
+        return None, 'N/A', 'Data fundamental tidak tersedia.', {}
+
+    score = 0
+    notes = []
+
+    # P/E Ratio (0–25 pts)
+    pe = f.get('pe')
+    if pe and pe > 0:
+        thr = [10, 15, 20, 25] if exchange == 'IDX' else [15, 20, 25, 30]
+        if pe < thr[0]:   sc = 25
+        elif pe < thr[1]: sc = 20
+        elif pe < thr[2]: sc = 15
+        elif pe < thr[3]: sc = 10
+        else:             sc = 5
+        score += sc
+        if sc >= 20: notes.append(f'P/E {pe:.1f}x rendah — valuasi menarik')
+        elif sc <= 5: notes.append(f'P/E {pe:.1f}x premium')
+
+    # Profit Margin (0–20 pts)
+    pm = f.get('margin')
+    if pm is not None:
+        pm_pct = pm * 100
+        if pm_pct >= 20:   sc = 20
+        elif pm_pct >= 15: sc = 16
+        elif pm_pct >= 10: sc = 12
+        elif pm_pct >= 5:  sc = 8
+        elif pm_pct >= 0:  sc = 4
+        else:              sc = 0
+        score += sc
+        if sc >= 16: notes.append(f'margin laba {pm_pct:.1f}% sangat kuat')
+        elif sc == 0: notes.append(f'margin negatif {pm_pct:.1f}%')
+
+    # ROE (0–20 pts)
+    roe = f.get('roe')
+    if roe is not None:
+        roe_pct = roe * 100
+        if roe_pct >= 20:   sc = 20
+        elif roe_pct >= 15: sc = 16
+        elif roe_pct >= 10: sc = 12
+        elif roe_pct >= 5:  sc = 8
+        elif roe_pct >= 0:  sc = 4
+        else:               sc = 0
+        score += sc
+        if sc >= 16: notes.append(f'ROE {roe_pct:.1f}% tinggi')
+
+    # Revenue Growth (0–15 pts)
+    rg = f.get('rev_growth')
+    if rg is not None:
+        rg_pct = rg * 100
+        if rg_pct >= 15:   sc = 15
+        elif rg_pct >= 10: sc = 12
+        elif rg_pct >= 5:  sc = 9
+        elif rg_pct >= 0:  sc = 5
+        else:              sc = 0
+        score += sc
+        if rg_pct >= 10: notes.append(f'pendapatan tumbuh {rg_pct:.1f}%')
+        elif rg_pct < 0: notes.append(f'pendapatan turun {abs(rg_pct):.1f}%')
+
+    # Dividend Yield (0–10 pts)  — yfinance sudah persen (5.89 = 5.89%)
+    dy = f.get('div_yield')
+    if dy and dy > 0:
+        dy_pct = dy  # langsung dalam bentuk persen
+        if dy_pct >= 4:   sc = 10
+        elif dy_pct >= 3: sc = 8
+        elif dy_pct >= 2: sc = 6
+        elif dy_pct >= 1: sc = 4
+        else:             sc = 2
+        score += sc
+        if sc >= 8: notes.append(f'dividen {dy_pct:.1f}% menarik')
+
+    # Debt/Equity (0–10 pts) — yfinance: 79.5 = 79.5% = 0.795x ratio
+    de_raw = f.get('debt_eq')
+    if de_raw is not None:
+        de = de_raw / 100  # konversi ke rasio (79.5 → 0.795x)
+        if de <= 0.3:   sc = 10
+        elif de <= 0.5: sc = 8
+        elif de <= 1.0: sc = 6
+        elif de <= 2.0: sc = 4
+        else:           sc = 2
+        score += sc
+        if de <= 0.3: notes.append(f'utang rendah D/E {de:.2f}x')
+        elif de > 2:  notes.append(f'utang tinggi D/E {de:.2f}x')
+
+    score  = min(100, score)
+    signal = 'BUY' if score >= 70 else 'HOLD' if score >= 45 else 'SELL'
+    assessment = ('. '.join(notes).capitalize() + '.') if notes else 'Tidak ada sinyal fundamental dominan.'
+
+    def _pct(v):    return f'{v*100:.1f}%' if v is not None else '—'
+    def _x(v):      return f'{v:.1f}x'     if v is not None else '—'
+    def _n(v, d=2): return f'{v:.{d}f}'    if v is not None else '—'
+
+    de_ratio = (de_raw / 100) if de_raw is not None else None
+    pe_v     = f.get('pe')
+    dy_v     = f.get('div_yield')  # sudah persen
+
+    display = {
+        'pe':     _x(pe_v) if pe_v and pe_v > 0 else '—',
+        'pb':     _x(f.get('pb')),
+        'eps':    _n(f.get('eps'), 0) if f.get('eps') else '—',
+        'margin': _pct(f.get('margin')),
+        'roe':    _pct(f.get('roe')),
+        'rev_gr': ('+' if (f.get('rev_growth') or 0) >= 0 else '') + _pct(f.get('rev_growth')),
+        'div':    f'{dy_v:.2f}%' if dy_v else '0%',
+        'de':     _x(de_ratio) if de_ratio is not None else '—',
+        'beta':   _n(f.get('beta')),
+    }
+
+    return score, signal, assessment, display
+
 def _fund_from_sentimen(label: str, sentimen_data: dict):
     """Cari sinyal fundamental untuk saham ini dari data berita."""
     panas = sentimen_data.get('saham_panas', {})
@@ -962,12 +1136,36 @@ def _fund_from_sentimen(label: str, sentimen_data: dict):
     return None
 
 def prepare_rekomendasi(sentimen_data: dict) -> dict:
-    """Generate STOCK_REKOMENDASI untuk 3 timeframe: swing, medium, longterm."""
-    log.info('── Analisis teknikal saham (Yahoo Finance) ──')
+    """Generate STOCK_REKOMENDASI dengan analisis teknikal + fundamental untuk 3 timeframe."""
+    log.info('── Analisis teknikal & fundamental saham ──')
     ts         = fmt_wib()
     all_stocks = STOCKS_IDX + STOCKS_US
     result     = {}
 
+    # ── Fase 1: pre-fetch fundamental sekali per saham ────────────────
+    log.info('  Fase 1: mengambil data fundamental...')
+    fund_cache = {}
+    for stk in all_stocks:
+        symbol = stk['symbol']
+        label  = stk['label']
+        exch   = stk['exchange']
+        raw    = _fetch_yf_fundamental(symbol)
+        f_sc, f_sig, f_assess, f_disp = _score_fundamental(raw, exch)
+        news_f = _fund_from_sentimen(label, sentimen_data)
+        fund_cache[label] = {
+            'score':          f_sc,
+            'signal':         f_sig,
+            'assessment':     f_assess,
+            'metrics':        f_disp,
+            'news_signal':    news_f.get('signal')    if news_f else None,
+            'news_skor':      news_f.get('skor')      if news_f else None,
+            'news_ringkasan': news_f.get('ringkasan') if news_f else None,
+        }
+        log.info(f'    {label}: fund_score={f_sc} signal={f_sig}')
+        time.sleep(0.35)
+
+    # ── Fase 2: analisis teknikal per timeframe ────────────────────────
+    log.info('  Fase 2: analisis teknikal per timeframe...')
     for tf_key, tf_cfg in REKOMENDASI_TIMEFRAMES.items():
         log.info(f"  Timeframe: {tf_cfg['label']}")
         pairs = []
@@ -976,24 +1174,28 @@ def prepare_rekomendasi(sentimen_data: dict) -> dict:
             symbol = stk['symbol']
             label  = stk['label']
             exch   = stk['exchange']
+            fc     = fund_cache.get(label, {})
 
             closes = _fetch_yf_ohlcv(symbol, tf_cfg['yf_interval'], tf_cfg['yf_range'])
             time.sleep(0.35)
 
             if len(closes) < tf_cfg['min_candles']:
-                log.info(f"    {label} ({symbol}): {len(closes)} candle < min {tf_cfg['min_candles']}, lewati")
+                log.info(f"    {label}: {len(closes)} candle < min {tf_cfg['min_candles']}, lewati")
                 continue
 
-            rsi   = _calc_rsi(closes)
+            rsi    = _calc_rsi(closes)
             sma20  = _sma(closes, 20)
             sma50  = _sma(closes, 50)
             sma200 = _sma(closes, 200)
             price  = closes[-1]
 
-            score, direction, bull, bear, total = _score_stock(
+            t_score, direction, bull, bear, total = _score_stock(
                 closes, rsi, sma20, sma50, sma200, tf_cfg['momentum_n']
             )
-            fund = _fund_from_sentimen(label, sentimen_data)
+
+            # Skor komposit: 60% teknikal + 40% fundamental
+            f_score   = fc.get('score')
+            composite = round(t_score * 0.6 + f_score * 0.4) if f_score is not None else t_score
 
             pairs.append({
                 'label':      label,
@@ -1001,7 +1203,8 @@ def prepare_rekomendasi(sentimen_data: dict) -> dict:
                 'exchange':   exch,
                 'sector':     stk.get('sector', ''),
                 'direction':  direction,
-                'score':      score,
+                'score':      t_score,
+                'composite':  composite,
                 'rsi':        rsi,
                 'last_close': _fmt_price(price, exch),
                 'total_sigs': total,
@@ -1010,11 +1213,19 @@ def prepare_rekomendasi(sentimen_data: dict) -> dict:
                 'sma20':      _fmt_price(sma20, exch)  if sma20  else '—',
                 'sma50':      _fmt_price(sma50, exch)  if sma50  else '—',
                 'sma200':     _fmt_price(sma200, exch) if sma200 else '—',
-                'fundamental': fund,
+                'fundamental': {
+                    'fund_score':      fc.get('score'),
+                    'fund_signal':     fc.get('signal'),
+                    'fund_assessment': fc.get('assessment'),
+                    'metrics':         fc.get('metrics', {}),
+                    'news_signal':     fc.get('news_signal'),
+                    'news_skor':       fc.get('news_skor'),
+                    'news_ringkasan':  fc.get('news_ringkasan'),
+                },
             })
-            log.info(f"    {label}: {direction} score={score} RSI={rsi} price={_fmt_price(price, exch)}")
+            log.info(f"    {label}: tech={t_score} fund={f_score} composite={composite} dir={direction}")
 
-        pairs.sort(key=lambda x: x['score'], reverse=True)
+        pairs.sort(key=lambda x: x['composite'], reverse=True)
         result[tf_key] = {
             'label':     tf_cfg['label'],
             'frame':     tf_cfg['frame'],
@@ -1343,7 +1554,7 @@ def run_digest():
     log.info(f"  Kalender:    {kalender['total_event']} event USD")
     log.info(f"  Sentimen:    {sentimen['ringkasan']['total_berita']} berita → {sentimen['ringkasan']['overall']}")
     log.info(f"  Geopolitik:  {geopolitik['total_berita']} berita")
-    log.info(f"  Rekomendasi: {total_rek} saham dianalisis (3 timeframe)")
+    log.info(f"  Rekomendasi: {total_rek} saham dianalisis — teknikal + fundamental (3 timeframe)")
 
     log.info('── Menyimpan data ──')
     save_json_files(kalender, sentimen, geopolitik)

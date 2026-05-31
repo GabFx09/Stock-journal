@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """
-stock_news_digest.py v2.3 — Analisis Saham Otomatis
+stock_news_digest.py v2.4 — Analisis Saham Otomatis
 Mengumpulkan berita saham, analisis sentimen, dan mengirim 3 email harian jam 07:00 WIB.
 
 Penggunaan:
   python stock_news_digest.py --run-now     # Jalankan sekarang (test)
   python stock_news_digest.py               # Mode daemon — tunggu jam 07:00 WIB setiap hari
   python stock_news_digest.py --setup       # Buat ulang config_email.ini
+
+Pembaruan v2.4:
+  - Tambah STOCK_REKOMENDASI: analisis teknikal otomatis (RSI, SMA20/50/200, Momentum)
+  - 3 timeframe: Swing (1-5 hari), Medium (1-4 minggu), Long-term (1-3 bulan)
+  - Data harga dari Yahoo Finance (requests, tanpa package tambahan)
+  - Augmentasi fundamental dari data sentimen berita
 
 Pembaruan v2.3:
   - Terjemahan: pakai translate.googleapis.com (client=gtx) via requests — TANPA package tambahan
@@ -171,6 +177,59 @@ KNOWN_TICKERS = {
 }
 
 TICKER_RE = re.compile(r'\b([A-Z]{2,5})\b')
+
+# ─── DAFTAR SAHAM UNTUK ANALISIS TEKNIKAL ─────────────────────────────────────
+STOCKS_IDX = [
+    {'label': 'BBCA',  'name': 'Bank BCA',           'symbol': 'BBCA.JK',  'exchange': 'IDX', 'sector': 'Perbankan'},
+    {'label': 'BBRI',  'name': 'Bank BRI',            'symbol': 'BBRI.JK',  'exchange': 'IDX', 'sector': 'Perbankan'},
+    {'label': 'BMRI',  'name': 'Bank Mandiri',        'symbol': 'BMRI.JK',  'exchange': 'IDX', 'sector': 'Perbankan'},
+    {'label': 'TLKM',  'name': 'Telkom Indonesia',    'symbol': 'TLKM.JK',  'exchange': 'IDX', 'sector': 'Telekomunikasi'},
+    {'label': 'ASII',  'name': 'Astra International', 'symbol': 'ASII.JK',  'exchange': 'IDX', 'sector': 'Konglomerat'},
+    {'label': 'UNVR',  'name': 'Unilever Indonesia',  'symbol': 'UNVR.JK',  'exchange': 'IDX', 'sector': 'Konsumer'},
+    {'label': 'ICBP',  'name': 'Indofood CBP',        'symbol': 'ICBP.JK',  'exchange': 'IDX', 'sector': 'Konsumer'},
+    {'label': 'PGAS',  'name': 'Perusahaan Gas Neg.', 'symbol': 'PGAS.JK',  'exchange': 'IDX', 'sector': 'Energi'},
+    {'label': 'INDF',  'name': 'Indofood Sukses',     'symbol': 'INDF.JK',  'exchange': 'IDX', 'sector': 'Konsumer'},
+    {'label': 'HMSP',  'name': 'HM Sampoerna',        'symbol': 'HMSP.JK',  'exchange': 'IDX', 'sector': 'Konsumer'},
+]
+
+STOCKS_US = [
+    {'label': 'NVDA',  'name': 'NVIDIA Corp.',        'symbol': 'NVDA',     'exchange': 'NASDAQ', 'sector': 'Semikonduktor'},
+    {'label': 'AAPL',  'name': 'Apple Inc.',          'symbol': 'AAPL',     'exchange': 'NASDAQ', 'sector': 'Teknologi'},
+    {'label': 'MSFT',  'name': 'Microsoft Corp.',     'symbol': 'MSFT',     'exchange': 'NASDAQ', 'sector': 'Teknologi'},
+    {'label': 'META',  'name': 'Meta Platforms',      'symbol': 'META',     'exchange': 'NASDAQ', 'sector': 'Teknologi'},
+    {'label': 'AMZN',  'name': 'Amazon.com Inc.',     'symbol': 'AMZN',     'exchange': 'NASDAQ', 'sector': 'E-Commerce'},
+    {'label': 'GOOGL', 'name': 'Alphabet Inc.',       'symbol': 'GOOGL',    'exchange': 'NASDAQ', 'sector': 'Teknologi'},
+    {'label': 'TSLA',  'name': 'Tesla Inc.',          'symbol': 'TSLA',     'exchange': 'NASDAQ', 'sector': 'EV/Otomotif'},
+    {'label': 'SPY',   'name': 'S&P 500 ETF',         'symbol': 'SPY',      'exchange': 'NYSE',   'sector': 'ETF Indeks'},
+]
+
+# ─── KONFIGURASI TIMEFRAME REKOMENDASI ────────────────────────────────────────
+REKOMENDASI_TIMEFRAMES = {
+    'swing': {
+        'label':       'Swing (1-5 Hari)',
+        'frame':       '4H / 1D',
+        'yf_interval': '1d',
+        'yf_range':    '3mo',
+        'momentum_n':  5,
+        'min_candles': 25,
+    },
+    'medium': {
+        'label':       'Medium (1-4 Minggu)',
+        'frame':       '1D / 1W',
+        'yf_interval': '1d',
+        'yf_range':    '6mo',
+        'momentum_n':  10,
+        'min_candles': 55,
+    },
+    'longterm': {
+        'label':       'Long-term (1-3 Bulan)',
+        'frame':       '1W / Monthly',
+        'yf_interval': '1wk',
+        'yf_range':    '2y',
+        'momentum_n':  8,
+        'min_candles': 20,
+    },
+}
 
 GEO_KATEGORI_MAP = [
     (['tariff', 'trade war', 'import duty', 'export ban', 'trade deal'],  'Tarif/Perdagangan'),
@@ -775,6 +834,197 @@ def prepare_geopolitik(articles):
         'berita':       geo[:50],
     }
 
+# ─── TECHNICAL ANALYSIS — REKOMENDASI ────────────────────────────────────────
+_YF_HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) StockDigest/2.4',
+    'Accept':     'application/json',
+}
+
+def _fetch_yf_ohlcv(symbol: str, interval: str, range_: str) -> list:
+    """Ambil data harga close dari Yahoo Finance tanpa package tambahan."""
+    url = f'https://query2.finance.yahoo.com/v8/finance/chart/{symbol}'
+    try:
+        r = requests.get(url, params={'interval': interval, 'range': range_},
+                         headers=_YF_HEADERS, timeout=12)
+        r.raise_for_status()
+        data   = r.json()
+        result = (data.get('chart') or {}).get('result') or []
+        if not result:
+            return []
+        closes = result[0].get('indicators', {}).get('quote', [{}])[0].get('close', [])
+        return [c for c in closes if c is not None]
+    except Exception as e:
+        log.debug(f'  YF fetch {symbol} ({interval}/{range_}): {e}')
+        return []
+
+def _calc_rsi(closes: list, period: int = 14) -> float:
+    if len(closes) < period + 1:
+        return 50.0
+    deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
+    gains  = [max(d, 0.0) for d in deltas]
+    losses = [max(-d, 0.0) for d in deltas]
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+    if avg_loss == 0:
+        return 100.0
+    return round(100 - 100 / (1 + avg_gain / avg_loss), 2)
+
+def _sma(closes: list, period: int):
+    if len(closes) < period:
+        return None
+    return round(sum(closes[-period:]) / period, 4)
+
+def _score_stock(closes: list, rsi: float, sma20, sma50, sma200, momentum_n: int):
+    """
+    Hitung skor 0-100 dan sinyal teknikal.
+    Komponen: RSI extremity (0-30) + keselarasan MA (0-40) + momentum (0-30).
+    """
+    if not closes:
+        return 0, 'WAIT', 0, 0, 0
+
+    price = closes[-1]
+    bull = bear = 0
+
+    # RSI extremity
+    if rsi < 30:   bull += 2
+    elif rsi < 40: bull += 1
+    elif rsi > 70: bear += 2
+    elif rsi > 60: bear += 1
+
+    # Keselarasan MA (setiap MA yang melewati harga)
+    for ma in [sma20, sma50, sma200]:
+        if ma is not None:
+            if price > ma: bull += 1
+            else:          bear += 1
+
+    # Momentum (arah N candle terakhir)
+    if len(closes) >= momentum_n + 1:
+        up = sum(1 for i in range(-momentum_n, 0) if closes[i] > closes[i-1])
+        dn = momentum_n - up
+        if up > dn: bull += 1
+        elif dn > up: bear += 1
+
+    total     = bull + bear or 1
+    direction = 'BUY' if bull > bear else 'SELL' if bear > bull else 'WAIT'
+
+    # ── Skor komponen ──────────────────────────────────────────────
+    # RSI extremity (0-30)
+    if direction == 'BUY':
+        rsi_sc = 30 if rsi < 30 else 15 if rsi < 40 else 5
+    elif direction == 'SELL':
+        rsi_sc = 30 if rsi > 70 else 15 if rsi > 60 else 5
+    else:
+        rsi_sc = 0
+
+    # Keselarasan MA (0-40)
+    mas = [m for m in [sma20, sma50, sma200] if m is not None]
+    if mas:
+        aligned = sum(1 for m in mas if (price > m if direction == 'BUY' else price < m))
+        ma_sc   = round(aligned / len(mas) * 40)
+    else:
+        ma_sc = 0
+
+    # Momentum (0-30)
+    if len(closes) >= momentum_n + 1:
+        up    = sum(1 for i in range(-momentum_n, 0) if closes[i] > closes[i-1])
+        m_cnt = up if direction == 'BUY' else (momentum_n - up)
+        mom_sc = round(m_cnt / momentum_n * 30)
+    else:
+        mom_sc = 0
+
+    score = min(100, rsi_sc + ma_sc + mom_sc)
+    return score, direction, bull, bear, bull + bear
+
+def _fmt_price(val, exchange: str) -> str:
+    if val is None:
+        return '—'
+    if exchange == 'IDX':
+        return f'{val:,.0f}'
+    return f'{val:.2f}'
+
+def _fund_from_sentimen(label: str, sentimen_data: dict):
+    """Cari sinyal fundamental untuk saham ini dari data berita."""
+    panas = sentimen_data.get('saham_panas', {})
+    for s in panas.get('bullish', []):
+        if s.get('ticker') == label:
+            return {
+                'signal':    'BUY',
+                'skor':      round(s['skor'], 2),
+                'ringkasan': s.get('judul_id', s.get('judul', ''))[:130],
+            }
+    for s in panas.get('bearish', []):
+        if s.get('ticker') == label:
+            return {
+                'signal':    'SELL',
+                'skor':      round(s['skor'], 2),
+                'ringkasan': s.get('judul_id', s.get('judul', ''))[:130],
+            }
+    return None
+
+def prepare_rekomendasi(sentimen_data: dict) -> dict:
+    """Generate STOCK_REKOMENDASI untuk 3 timeframe: swing, medium, longterm."""
+    log.info('── Analisis teknikal saham (Yahoo Finance) ──')
+    ts         = fmt_wib()
+    all_stocks = STOCKS_IDX + STOCKS_US
+    result     = {}
+
+    for tf_key, tf_cfg in REKOMENDASI_TIMEFRAMES.items():
+        log.info(f"  Timeframe: {tf_cfg['label']}")
+        pairs = []
+
+        for stk in all_stocks:
+            symbol = stk['symbol']
+            label  = stk['label']
+            exch   = stk['exchange']
+
+            closes = _fetch_yf_ohlcv(symbol, tf_cfg['yf_interval'], tf_cfg['yf_range'])
+            time.sleep(0.35)
+
+            if len(closes) < tf_cfg['min_candles']:
+                log.info(f"    {label} ({symbol}): {len(closes)} candle < min {tf_cfg['min_candles']}, lewati")
+                continue
+
+            rsi   = _calc_rsi(closes)
+            sma20  = _sma(closes, 20)
+            sma50  = _sma(closes, 50)
+            sma200 = _sma(closes, 200)
+            price  = closes[-1]
+
+            score, direction, bull, bear, total = _score_stock(
+                closes, rsi, sma20, sma50, sma200, tf_cfg['momentum_n']
+            )
+            fund = _fund_from_sentimen(label, sentimen_data)
+
+            pairs.append({
+                'label':      label,
+                'name':       stk.get('name', ''),
+                'exchange':   exch,
+                'sector':     stk.get('sector', ''),
+                'direction':  direction,
+                'score':      score,
+                'rsi':        rsi,
+                'last_close': _fmt_price(price, exch),
+                'total_sigs': total,
+                'bull':       bull,
+                'bear':       bear,
+                'sma20':      _fmt_price(sma20, exch)  if sma20  else '—',
+                'sma50':      _fmt_price(sma50, exch)  if sma50  else '—',
+                'sma200':     _fmt_price(sma200, exch) if sma200 else '—',
+                'fundamental': fund,
+            })
+            log.info(f"    {label}: {direction} score={score} RSI={rsi} price={_fmt_price(price, exch)}")
+
+        pairs.sort(key=lambda x: x['score'], reverse=True)
+        result[tf_key] = {
+            'label':     tf_cfg['label'],
+            'frame':     tf_cfg['frame'],
+            'generated': ts,
+            'pairs':     pairs,
+        }
+        log.info(f"  Selesai {tf_cfg['label']}: {len(pairs)}/{len(all_stocks)} saham")
+
+    return result
+
 # ─── FILE WRITERS ─────────────────────────────────────────────────────────────
 def save_json_files(kalender, sentimen, geopolitik):
     for path, data in [
@@ -786,14 +1036,15 @@ def save_json_files(kalender, sentimen, geopolitik):
             json.dump(data, f, ensure_ascii=False, indent=2)
         log.info(f'  Tersimpan: {os.path.basename(path)}')
 
-def generate_js_data(kalender, sentimen, geopolitik):
+def generate_js_data(kalender, sentimen, geopolitik, rekomendasi=None):
     ts = fmt_wib()
-    js  = f'// Auto-generated by stock_news_digest.py v2.3 — {ts}\n'
+    js  = f'// Auto-generated by stock_news_digest.py v2.4 — {ts}\n'
     js += f'// Jangan edit manual — file ini di-overwrite setiap hari jam 07:00 WIB\n'
-    js += f'var STOCK_LAST_UPDATE = {json.dumps(ts)};\n'
-    js += f'var STOCK_KALENDER   = {json.dumps(kalender,   ensure_ascii=False)};\n'
-    js += f'var STOCK_SENTIMEN   = {json.dumps(sentimen,   ensure_ascii=False)};\n'
-    js += f'var STOCK_GEOPOLITIK = {json.dumps(geopolitik, ensure_ascii=False)};\n'
+    js += f'var STOCK_LAST_UPDATE  = {json.dumps(ts)};\n'
+    js += f'var STOCK_KALENDER     = {json.dumps(kalender,    ensure_ascii=False)};\n'
+    js += f'var STOCK_SENTIMEN     = {json.dumps(sentimen,    ensure_ascii=False)};\n'
+    js += f'var STOCK_GEOPOLITIK   = {json.dumps(geopolitik,  ensure_ascii=False)};\n'
+    js += f'var STOCK_REKOMENDASI  = {json.dumps(rekomendasi or {}, ensure_ascii=False)};\n'
     with open(DATA_JS_FILE, 'w', encoding='utf-8') as f:
         f.write(js)
     log.info(f'  JS data: {os.path.basename(DATA_JS_FILE)}')
@@ -1066,7 +1317,7 @@ def send_email(cfg, subject, html_body):
 # ─── MAIN ORCHESTRATOR ────────────────────────────────────────────────────────
 def run_digest():
     log.info('═' * 64)
-    log.info(f'STOCK DIGEST v2.3 MULAI — {fmt_wib()}')
+    log.info(f'STOCK DIGEST v2.4 MULAI — {fmt_wib()}')
     log.info('═' * 64)
 
     cfg = load_config()
@@ -1086,15 +1337,17 @@ def run_digest():
     kalender   = prepare_kalender(cal_events, weekend_mode, cal_note)
     sentimen   = prepare_sentimen(articles)
     geopolitik = prepare_geopolitik(articles)
+    rekomendasi = prepare_rekomendasi(sentimen)
 
+    total_rek = sum(len(v.get('pairs', [])) for v in rekomendasi.values())
     log.info(f"  Kalender:    {kalender['total_event']} event USD")
     log.info(f"  Sentimen:    {sentimen['ringkasan']['total_berita']} berita → {sentimen['ringkasan']['overall']}")
     log.info(f"  Geopolitik:  {geopolitik['total_berita']} berita")
-    log.info(f"  Rekomendasi: {sentimen['rekomendasi_pasar'][:60]}...")
+    log.info(f"  Rekomendasi: {total_rek} saham dianalisis (3 timeframe)")
 
     log.info('── Menyimpan data ──')
     save_json_files(kalender, sentimen, geopolitik)
-    generate_js_data(kalender, sentimen, geopolitik)
+    generate_js_data(kalender, sentimen, geopolitik, rekomendasi)
 
     log.info('── Mengirim email ──')
     today = today_str()
@@ -1111,7 +1364,7 @@ def run_digest():
 # ─── ENTRY POINT ──────────────────────────────────────────────────────────────
 def main():
     import argparse
-    p = argparse.ArgumentParser(description='Stock News Digest v2.3 — Analisis Saham Otomatis')
+    p = argparse.ArgumentParser(description='Stock News Digest v2.4 — Analisis Saham Otomatis')
     p.add_argument('--run-now', action='store_true', help='Jalankan digest sekarang (skip jadwal)')
     p.add_argument('--setup',   action='store_true', help='Buat ulang config_email.ini')
     args = p.parse_args()

@@ -488,6 +488,7 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
     <button class="nb" onclick="showTab('kalender',this)">📅 Kalender</button>
     <button class="nb" onclick="showTab('sentimen',this)">📊 Sentimen</button>
     <button class="nb" onclick="showTab('geopolitik',this)">🌍 Geopolitik</button>
+    <button class="nb" onclick="showTab('rekomend',this)">🎯 Rekomendasi</button>
   </div>
 
   <div id="main">
@@ -914,6 +915,11 @@ textarea{resize:vertical;min-height:60px;line-height:1.5}
       <div id="geo-content"><div class="em" style="padding:48px 16px">Memuat geopolitik...</div></div>
     </div>
 
+    <!-- ═══ REKOMENDASI ═══ -->
+    <div id="tab-rekomend" class="tab">
+      <div id="rekomend-content"></div>
+    </div>
+
   </div><!-- end main -->
 </div><!-- end app -->
 
@@ -1005,6 +1011,7 @@ function showTab(n,btn){
   if(n==='kalender')  renderKalender();
   if(n==='sentimen')  renderSentimen();
   if(n==='geopolitik') renderGeopolitik();
+  if(n==='rekomend')   renderRekomend();
 }
 
 // ── GOOGLE SHEETS SYNC ───────────────────────────────────────────
@@ -1658,8 +1665,8 @@ function renderAll(){
 // ── KALENDER / SENTIMEN / GEOPOLITIK ────────────────────────────────────────
 
 function _noData(tab){
-  const icons={kalender:'📅',sentimen:'📊',geopolitik:'🌍'};
-  const names={kalender:'kalender ekonomi hari ini',sentimen:'analisis sentimen saham',geopolitik:'berita geopolitik terkini'};
+  const icons={kalender:'📅',sentimen:'📊',geopolitik:'🌍',rekomend:'🎯'};
+  const names={kalender:'kalender ekonomi hari ini',sentimen:'analisis sentimen saham',geopolitik:'berita geopolitik terkini',rekomend:'rekomendasi teknikal saham'};
   return `<div class="em" style="padding:48px 16px">
     <div style="font-size:40px;margin-bottom:14px">${icons[tab]}</div>
     <div style="color:var(--txt);font-size:14px;font-weight:700;margin-bottom:10px">Data Belum Tersedia</div>
@@ -1828,6 +1835,208 @@ function renderGeopolitik(){
       <div class="ct">🌐 Berita Geopolitik Penting (${Math.min(berita.length,30)} berita)</div>
       ${items}
     </div>`;
+}
+
+// ── REKOMENDASI TEKNIKAL ─────────────────────────────────────────
+let _rkTf = 'swing';
+
+function renderRekomend() {
+  const el = $('rekomend-content');
+  if (!el) return;
+  if (!window.STOCK_REKOMENDASI) { el.innerHTML = _noData('rekomend'); return; }
+  _rkRenderByTf(el, _rkTf);
+}
+
+function _rkSetTf(tf) {
+  _rkTf = tf;
+  const el = $('rekomend-content');
+  if (el) _rkRenderByTf(el, tf);
+}
+
+function _rkRenderByTf(el, tf) {
+  const data = (window.STOCK_REKOMENDASI || {})[tf];
+
+  const tfMeta = {
+    swing:    { label:'📈 Swing (1–5 Hari)',       frame:'4H / 1D' },
+    medium:   { label:'📊 Medium (1–4 Minggu)',     frame:'1D / 1W' },
+    longterm: { label:'🏦 Long-term (1–3 Bulan)',   frame:'1W / Monthly' },
+  };
+
+  const tfBtns = ['swing','medium','longterm'].map(t => {
+    const on = t === tf;
+    return `<button onclick="_rkSetTf('${t}')" style="padding:7px 15px;font-size:11px;font-weight:600;border-radius:8px;cursor:pointer;border:1px solid rgba(255,255,255,${on?'.2':'.07'});background:${on?'var(--gdim)':'rgba(255,255,255,.03)'};color:${on?'var(--green)':'var(--sub)'};transition:all .18s">${tfMeta[t].label}</button>`;
+  }).join('');
+  const tfSelector = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">${tfBtns}</div>`;
+
+  if (!data || !data.pairs?.length) {
+    el.innerHTML = tfSelector + `<div class="em" style="padding:48px 16px">
+      <div style="font-size:40px;margin-bottom:14px">🎯</div>
+      <div style="color:var(--txt);font-size:14px;font-weight:700;margin-bottom:10px">Data Rekomendasi Belum Tersedia</div>
+      <div style="font-size:12px;color:var(--sub);line-height:1.9">
+        Jalankan script untuk menghasilkan data ${tfMeta[tf].label}:<br>
+        <code style="background:var(--surf);padding:4px 14px;border-radius:6px;font-size:11px;color:var(--green);display:inline-block;margin:10px 0">python stock_news_digest.py --run-now</code>
+      </div>
+    </div>`;
+    return;
+  }
+
+  const results = data.pairs.map(p => ({
+    ...p,
+    lastClose: p.last_close,
+    total:     p.total_sigs,
+    dirColor:  p.direction==='BUY'?'var(--green)':p.direction==='SELL'?'var(--red)':'var(--sub)',
+  }));
+
+  const header = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    <div class="ct" style="margin-bottom:0">🎯 Rekomendasi Teknikal — ${tfMeta[tf].label}</div>
+    <div style="background:rgba(9,23,42,1);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:5px 12px;font-size:10px;color:var(--sub)">
+      🕐 Diperbarui: <b style="color:var(--txt)">${data.generated||'—'}</b>
+    </div>
+  </div>`;
+
+  const rows = results.map((r, i) => {
+    const rank = i + 1;
+    const rC   = rank===1?'var(--gold)':rank===2?'#94a3b8':rank===3?'#cd7c2e':'var(--sub)';
+    const dBg  = r.direction==='BUY'?'var(--gdim)':r.direction==='SELL'?'var(--rdim)':'rgba(100,116,139,.12)';
+    const sC   = r.score>=70?'var(--green)':r.score>=45?'var(--gold)':'var(--sub)';
+    const rC2  = r.rsi<30?'var(--green)':r.rsi>70?'var(--red)':r.rsi<40?'#86efac':r.rsi>60?'#fca5a5':'var(--sub)';
+    const exBdg = r.exchange ? `<span style="font-size:9px;color:var(--mut);margin-left:4px">${r.exchange}</span>` : '';
+    return `<tr style="border-top:1px solid rgba(255,255,255,.04)">
+      <td style="padding:9px 10px;text-align:center;font-weight:800;color:${rC};font-size:13px">${rank}</td>
+      <td style="padding:9px 12px">
+        <span style="font-family:var(--mono);font-weight:700;color:var(--txt)">${r.label}</span>${exBdg}
+        ${r.sector?`<div style="font-size:9px;color:var(--mut);margin-top:2px">${r.sector}</div>`:''}
+      </td>
+      <td style="padding:9px 12px">
+        <span style="font-family:var(--mono);font-weight:700;color:${sC};font-size:14px">${r.score}</span>
+        <div style="margin-top:3px;height:4px;width:56px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden">
+          <div style="width:${r.score}%;height:100%;background:${r.score>=70?'var(--green)':r.score>=45?'var(--gold)':'var(--red)'};border-radius:2px"></div>
+        </div>
+      </td>
+      <td style="padding:9px 12px"><span style="background:${dBg};color:${r.dirColor};padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700">${r.direction}</span></td>
+      <td style="padding:9px 12px;font-family:var(--mono);font-size:12px;color:${rC2}">${r.rsi}</td>
+      <td style="padding:9px 12px;font-family:var(--mono);font-size:12px;color:var(--sub)">${r.lastClose}</td>
+    </tr>`;
+  }).join('');
+
+  const ranking = `<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;font-weight:600;color:var(--sub)">🏆 RANKING HARI INI · ${tfMeta[tf].frame}</span>
+      <span style="font-size:10px;color:var(--mut)">Skor 0–100 · ${tfMeta[tf].label}</span>
+    </div>
+    <table class="tbl" style="margin:0">
+      <thead><tr><th style="width:36px">#</th><th>SAHAM</th><th>SKOR</th><th>SINYAL</th><th>RSI(14)</th><th>HARGA</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+
+  const legend = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;font-size:10px;color:var(--sub);padding:0 2px">
+    <span>📊 Komponen skor:</span>
+    <span style="color:var(--gold)">RSI extremity (0–30)</span>
+    <span style="color:var(--blue)">Keselarasan MA (0–40)</span>
+    <span style="color:var(--purple)">Momentum 5 candle (0–30)</span>
+  </div>`;
+
+  const partial = results.length < 5
+    ? `<div style="color:var(--sub);font-size:11px;text-align:center;padding:6px 0 10px">⚠️ Hanya ${results.length} saham tersedia saat script dijalankan.</div>` : '';
+
+  el.innerHTML = tfSelector + header + ranking + legend + partial + results.map(r => _rkDetailCard(r)).join('');
+}
+
+function _rkRsiBar(rsi) {
+  const pos  = Math.max(2, Math.min(98, rsi));
+  const col  = rsi<30?'var(--green)':rsi>70?'var(--red)':'var(--gold)';
+  const zone = rsi<30?'Oversold':rsi>70?'Overbought':rsi<45?'Bearish':rsi>55?'Bullish':'Netral';
+  return `<div style="margin:7px 0 10px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-size:10px;color:var(--sub)">RSI(14)</span>
+      <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${col}">${rsi} <span style="opacity:.65;font-weight:400">— ${zone}</span></span>
+    </div>
+    <div style="height:6px;background:linear-gradient(90deg,#10b981 0%,#334a62 30%,#334a62 70%,#f43f5e 100%);border-radius:3px;position:relative">
+      <div style="position:absolute;left:30%;top:-2px;width:1px;height:10px;background:rgba(255,255,255,.3)"></div>
+      <div style="position:absolute;left:70%;top:-2px;width:1px;height:10px;background:rgba(255,255,255,.3)"></div>
+      <div style="position:absolute;left:calc(${pos}% - 5px);top:-3px;width:10px;height:12px;background:${col};border-radius:3px;border:2px solid rgba(0,0,0,.5)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:3px">
+      <span style="font-size:9px;color:var(--green)">0 ← Oversold 30</span>
+      <span style="font-size:9px;color:var(--red)">70 Overbought → 100</span>
+    </div>
+  </div>`;
+}
+
+function _rkMaRow(label, val, price) {
+  const pF = parseFloat(price), vF = parseFloat(val);
+  const ok  = val !== '—' && !isNaN(pF) && !isNaN(vF);
+  const up  = ok && pF > vF;
+  const col = ok ? (up ? 'var(--green)' : 'var(--red)') : 'var(--mut)';
+  const tag = ok ? `<span style="font-size:9px;opacity:.6">${up ? '↑ di atas' : '↓ di bawah'}</span>` : '';
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+    <span style="font-size:11px;color:var(--sub)">${label}</span>
+    <span style="font-family:var(--mono);font-size:11px;color:${col}">${val} ${tag}</span>
+  </div>`;
+}
+
+function _rkSignalText(r) {
+  if (r.direction === 'WAIT') return `Sinyal tidak konsisten (${r.bull} bullish vs ${r.bear} bearish dari ${r.total} indikator). Tunggu konfirmasi lebih lanjut sebelum entry.`;
+  const maj = r.direction === 'BUY' ? r.bull : r.bear;
+  let t = `${maj}/${r.total} indikator ${r.direction === 'BUY' ? 'bullish' : 'bearish'}.`;
+  if (r.rsi < 30)                          t += ' RSI oversold — potensi reversal naik.';
+  else if (r.rsi > 70)                     t += ' RSI overbought — potensi koreksi turun.';
+  else if (r.rsi < 40 && r.direction === 'BUY')  t += ' RSI mendekati zona bullish.';
+  else if (r.rsi > 60 && r.direction === 'SELL') t += ' RSI mendekati zona bearish.';
+  return t;
+}
+
+function _rkDetailCard(r) {
+  const bdr    = r.direction==='BUY'?'rgba(16,185,129,.2)':r.direction==='SELL'?'rgba(244,63,94,.2)':'rgba(100,116,139,.12)';
+  const bg     = r.direction==='BUY'?'rgba(16,185,129,.03)':r.direction==='SELL'?'rgba(244,63,94,.03)':'transparent';
+  const dirBg  = r.direction==='BUY'?'var(--gdim)':r.direction==='SELL'?'var(--rdim)':'rgba(100,116,139,.12)';
+  const sCol   = r.score>=70?'var(--green)':r.score>=45?'var(--gold)':'var(--sub)';
+  const exBdg  = r.exchange ? `<span class="bdg" style="background:var(--bdim);color:var(--blue);font-size:9px">${r.exchange}</span>` : '';
+  const secBdg = r.sector   ? `<span class="bdg" style="background:var(--pdim);color:var(--purple);font-size:9px">${r.sector}</span>` : '';
+  return `<div class="card" style="border:1px solid ${bdr};background:${bg};margin-bottom:10px;padding:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--txt)">${r.label}</span>
+        <span style="background:${dirBg};color:${r.dirColor};padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.03em">${r.direction}</span>
+        ${exBdg}${secBdg}
+      </div>
+      <div style="text-align:right">
+        <span style="font-size:24px;font-weight:800;font-family:var(--mono);color:${sCol}">${r.score}</span><span style="font-size:10px;color:var(--sub)">/100</span>
+      </div>
+    </div>
+    ${r.name ? `<div style="font-size:11px;color:var(--sub);margin-bottom:8px">${r.name}</div>` : ''}
+    <div style="font-family:var(--mono);font-size:12px;color:var(--sub);margin-bottom:8px">
+      Harga Terakhir: <strong style="color:var(--txt)">${r.lastClose}</strong>
+    </div>
+    ${_rkRsiBar(r.rsi)}
+    <div style="margin-bottom:10px">
+      ${_rkMaRow('SMA 20',  r.sma20,  r.lastClose)}
+      ${_rkMaRow('SMA 50',  r.sma50,  r.lastClose)}
+      ${_rkMaRow('SMA 200', r.sma200, r.lastClose)}
+    </div>
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:7px;padding:9px 11px">
+      <div style="font-size:9px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Analisis Teknikal</div>
+      <div style="font-size:11px;color:var(--txt);line-height:1.6;margin-bottom:${r.fundamental ? '8px' : '0'}">${_rkSignalText(r)}</div>
+      ${(()=>{
+        const f = r.fundamental; if (!f) return '';
+        const fCol = f.signal==='BUY'?'var(--green)':f.signal==='SELL'?'var(--red)':'var(--sub)';
+        const fBg  = f.signal==='BUY'?'var(--gdim)':f.signal==='SELL'?'var(--rdim)':'rgba(100,116,139,.1)';
+        const align = f.signal !== 'Netral' && f.signal === r.direction
+          ? ` <span style="color:var(--green);font-size:10px">✅ Selaras dengan teknikal.</span>`
+          : f.signal !== 'Netral' && r.direction !== 'WAIT' && f.signal !== r.direction
+          ? ` <span style="color:var(--gold);font-size:10px">⚠️ Berlawanan dengan teknikal.</span>` : '';
+        return `<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:8px">
+          <div style="font-size:9px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Analisis Fundamental</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+            <span style="background:${fBg};color:${fCol};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600">→ ${f.signal}</span>
+            ${f.skor != null ? `<span style="font-size:10px;color:var(--sub)">Skor: ${f.skor > 0 ? '+' : ''}${f.skor}</span>` : ''}
+          </div>
+          <div style="font-size:11px;color:var(--txt);line-height:1.6">${f.ringkasan||''}${align}</div>
+        </div>`;
+      })()}
+    </div>
+  </div>`;
 }
 
 async function pingGS(){

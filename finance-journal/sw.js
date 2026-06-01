@@ -1,4 +1,4 @@
-const CACHE = 'fj-pro-v9';
+const CACHE = 'fj-pro-v10';
 const CORE = [
   './',
   './index.html',

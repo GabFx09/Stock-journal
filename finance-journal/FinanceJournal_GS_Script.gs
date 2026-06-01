@@ -260,9 +260,15 @@ function getSheetData(ss, name, headers) {
   const rows = sheet.getDataRange().getValues();
   if (rows.length <= 1) return [];
   const hdrs = rows[0];
+  const tz = Session.getScriptTimeZone();
   return rows.slice(1)
     .filter(r => r[0] !== '' && r[0] !== null && r[0] !== undefined)
-    .map(r => Object.fromEntries(hdrs.map((h, i) => [h, r[i]])));
+    .map(r => Object.fromEntries(hdrs.map((h, i) => {
+      const v = r[i];
+      // Sheets kadang mengembalikan Date object — konversi ke string YYYY-MM-DD
+      if (v instanceof Date) return [h, Utilities.formatDate(v, tz, 'yyyy-MM-dd')];
+      return [h, v];
+    })));
 }
 
 function upsertRow(sheet, id, rowData) {

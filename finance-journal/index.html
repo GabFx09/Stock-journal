@@ -2088,9 +2088,9 @@ function saveRekening(){
 
 // ── INIT ─────────────────────────────────────────────────────────
 (function init(){
-  // Init month filters
+  // Init month filters — trx-month-flt sengaja dikosongkan agar semua transaksi tampil
   const m=thisMonth();
-  ['trx-month-flt','bgt-month','rpt-month'].forEach(id=>{const e=$(id);if(e)e.value=m;});
+  ['bgt-month','rpt-month'].forEach(id=>{const e=$(id);if(e)e.value=m;});
   ['trx-date','as-date'].forEach(id=>{const e=$(id);if(e)e.value=today();});
 
   // Init date display

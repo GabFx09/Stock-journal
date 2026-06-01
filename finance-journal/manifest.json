@@ -1,0 +1,41 @@
+{
+  "name": "FinanceJournal Pro",
+  "short_name": "FinanceJournal",
+  "description": "Aplikasi jurnal keuangan pribadi — catat transaksi, anggaran, hutang, tujuan, dan aset.",
+  "id": "/finance-journal/",
+  "start_url": "/finance-journal/",
+  "scope": "/finance-journal/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#06090f",
+  "theme_color": "#00c896",
+  "lang": "id",
+  "categories": ["finance", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

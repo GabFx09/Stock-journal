@@ -29,7 +29,14 @@ jobs:
           [ -f kalender.json ]          && cp kalender.json          _deploy/ || true
           [ -f sentimen.json ]          && cp sentimen.json          _deploy/ || true
           [ -f geopolitik.json ]        && cp geopolitik.json        _deploy/ || true
-          ls -lh _deploy/
+
+          mkdir -p _deploy/finance-journal
+          cp finance-journal/index.html    _deploy/finance-journal/
+          cp finance-journal/manifest.json _deploy/finance-journal/
+          cp finance-journal/sw.js        _deploy/finance-journal/
+          cp finance-journal/icon-192.png _deploy/finance-journal/
+          cp finance-journal/icon-512.png _deploy/finance-journal/
+          ls -lh _deploy/ _deploy/finance-journal/
 
       - name: Deploy ke GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

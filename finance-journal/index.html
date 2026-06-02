@@ -688,6 +688,7 @@ textarea{resize:vertical;min-height:64px;line-height:1.65}
     <div style="display:flex;gap:6px">
       <button id="btn-pull" class="btn bb" onclick="pullAll(true)" style="display:none;font-size:11px;padding:4px 12px">⬇ Ambil</button>
       <button id="btn-push" class="btn by" onclick="pushAll()" style="display:none;font-size:11px;padding:4px 12px">⬆ Kirim</button>
+      <button id="btn-rek-sync" class="btn bg" onclick="syncRekeningFromSheets()" style="display:none;font-size:11px;padding:4px 12px">💳 Sync Saldo</button>
       <button class="btn bh" onclick="openGSModal()" style="font-size:11px;padding:4px 12px">🔗 Hubungkan Sheets</button>
     </div>
   </div>
@@ -1289,6 +1290,24 @@ function setSync(st,txt){
   const show=st==='ok';
   $('btn-pull').style.display=show?'block':'none';
   $('btn-push').style.display=show?'block':'none';
+  if($('btn-rek-sync'))$('btn-rek-sync').style.display=show?'block':'none';
+}
+async function syncRekeningFromSheets(){
+  if(!GS_ON){toast('❌ Sheets belum terhubung!');return;}
+  toast('⏳ Mengambil saldo rekening dari Sheets...');
+  try{
+    const r=await gasGet({action:'getData'});
+    const raw=r.rekening||{};
+    const keys=Object.keys(raw);
+    if(!keys.length){alert('GAS tidak mengembalikan data rekening sama sekali!\nr.rekening = '+JSON.stringify(raw));return;}
+    const preview=keys.map(k=>k+': '+raw[k]).join('\n');
+    const ok=confirm('Data rekening dari Sheets:\n\n'+preview+'\n\nTerapkan ke app?');
+    if(ok){
+      rekening=Object.assign({BNI:0,JAGO:0,BRI:0,MANDIRI:0,BCA:0,DANA:0,GOPAY:0,OVO:0,LINKAJA:0},raw);
+      save();renderRekening();
+      toast('✅ Saldo rekening berhasil diperbarui dari Sheets!');
+    }
+  }catch(e){alert('Gagal ambil data: '+e.message);}
 }
 async function gasGet(p){const r=await fetch(GS_URL+'?'+new URLSearchParams(p),{redirect:'follow'});const d=await r.json();if(!d.ok)throw new Error(d.error||'Script error');return d;}
 async function gasPost(b){const r=await fetch(GS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)});const d=await r.json();if(!d.ok)throw new Error(d.error||'Script error');return d;}

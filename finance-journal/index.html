@@ -1295,10 +1295,16 @@ async function gasPost(b){const r=await fetch(GS_URL,{method:'POST',redirect:'fo
 async function pullAll(syncRekening=false){if(!GS_ON)return;setSync('busy','Mengambil data...');try{const r=await gasGet({action:'getData'});if(r.transactions)transactions=r.transactions;if(r.budgets)budgets=r.budgets;if(r.debts)debts=r.debts;if(r.goals)goals=r.goals;if(r.assets)assets=r.assets;let profLoaded=false;if(r.profile&&Object.keys(r.profile).length){profile=Object.assign({name:'',ccy:'IDR',income:0,savingTarget:0,goal:'',gaji:25,saldo:0,invest:0},r.profile);profLoaded=true;if($('p-name'))$('p-name').value=profile.name||'';if($('p-income'))$('p-income').value=profile.income||'';if($('p-save'))$('p-save').value=profile.savingTarget||'';if($('p-saldo'))$('p-saldo').value=profile.saldo||'';if($('p-invest'))$('p-invest').value=profile.invest||'';if($('p-gaji'))$('p-gaji').value=profile.gaji||25;if($('p-goal'))$('p-goal').value=profile.goal||'';closeMo();}
 // Rekening hanya diupdate dari Sheets jika dipanggil manual (syncRekening=true)
 // Saat startup otomatis, rekening TIDAK ditimpa agar saldo lokal aman
+let rekMsg='';
 if(syncRekening&&r.rekening&&Object.keys(r.rekening).length){
   const sheetsTotal=Object.values(r.rekening).reduce((s,v)=>s+(Number(v)||0),0);
-  if(sheetsTotal>0){rekening=Object.assign({BNI:0,JAGO:0,BRI:0,MANDIRI:0,BCA:0,DANA:0,GOPAY:0,OVO:0,LINKAJA:0},r.rekening);}
-}if(Array.isArray(r.notes))notes=r.notes;save();const mf=$('trx-month-flt');if(mf)mf.value='';renderAll();setSync('ok','✅ Data terbaru');const trxCount=Array.isArray(r.transactions)?r.transactions.length:0;toast(profLoaded?'✅ Data & profil '+profile.name+' berhasil diambil! ('+trxCount+' transaksi)':'✅ '+trxCount+' transaksi berhasil diambil dari Sheets!');}catch(e){setSync('err','🔴 Pull gagal: '+e.message);renderAll();}}
+  if(sheetsTotal>0){
+    rekening=Object.assign({BNI:0,JAGO:0,BRI:0,MANDIRI:0,BCA:0,DANA:0,GOPAY:0,OVO:0,LINKAJA:0},r.rekening);
+    rekMsg=' | Saldo rekening: '+Object.entries(r.rekening).filter(([,v])=>Number(v)>0).map(([k,v])=>k+' '+fmt(Number(v))).join(', ');
+  } else {
+    rekMsg=' | ⚠️ Rekening di Sheets masih 0 — input saldo di Computer B lalu Kirim dulu!';
+  }
+}if(Array.isArray(r.notes))notes=r.notes;save();const mf=$('trx-month-flt');if(mf)mf.value='';renderAll();setSync('ok','✅ Data terbaru');const trxCount=Array.isArray(r.transactions)?r.transactions.length:0;toast((profLoaded?'✅ Data & profil '+profile.name+' ('+trxCount+' transaksi)':'✅ '+trxCount+' transaksi dari Sheets')+rekMsg,5000);}catch(e){setSync('err','🔴 Pull gagal: '+e.message);renderAll();}}
 async function pushAll(){if(!GS_ON)return;setSync('busy','Mengirim...');try{await gasPost({action:'syncAll',transactions,budgets,debts,goals,assets,notes,profile,rekening});setSync('ok','✅ Terkirim — '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}));toast('✅ Semua data terkirim ke Sheets!');}catch(e){setSync('err','🔴 Push gagal');toast('❌ '+e.message,3500);}}
 
 // ── PROFILE MODAL ─────────────────────────────────────────────────
@@ -2083,10 +2089,14 @@ function closeRekeningModal(){const mo=$('rek-mo');if(mo)mo.style.display='none'
 function saveRekening(){
   Object.keys(rekening).forEach(k=>{const el=$('rek-'+k);if(el)rekening[k]=parseFloat(el.value)||0;});
   save();closeRekeningModal();renderRekening();updateAllStats();
-  toast('✅ Saldo rekening diperbarui!');
-  if(GS_ON) gasPost({action:'saveRekening',rekening})
-    .then(()=>setSync('ok','✅ Rekening tersimpan di Sheets'))
-    .catch(()=>setSync('err','🔴 Gagal sync rekening'));
+  if(GS_ON){
+    toast('⏳ Menyimpan saldo ke Sheets...');
+    gasPost({action:'saveRekening',rekening})
+      .then(()=>{setSync('ok','✅ Rekening tersimpan di Sheets');toast('✅ Saldo rekening tersimpan & terkirim ke Sheets!');})
+      .catch(()=>{setSync('err','🔴 Gagal sync rekening');toast('⚠️ Saldo tersimpan lokal tapi GAGAL kirim ke Sheets. Coba Kirim ulang.',4000);});
+  } else {
+    toast('⚠️ Saldo tersimpan di perangkat ini saja — hubungkan Sheets agar bisa diakses di perangkat lain!',4500);
+  }
 }
 
 // ── INIT ─────────────────────────────────────────────────────────

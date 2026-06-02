@@ -1293,16 +1293,16 @@ function setSync(st,txt){
 async function gasGet(p){const r=await fetch(GS_URL+'?'+new URLSearchParams(p),{redirect:'follow'});const d=await r.json();if(!d.ok)throw new Error(d.error||'Script error');return d;}
 async function gasPost(b){const r=await fetch(GS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)});const d=await r.json();if(!d.ok)throw new Error(d.error||'Script error');return d;}
 async function pullAll(syncRekening=true){if(!GS_ON)return;setSync('busy','Mengambil data...');try{const r=await gasGet({action:'getData'});if(r.transactions)transactions=r.transactions;if(r.budgets)budgets=r.budgets;if(r.debts)debts=r.debts;if(r.goals)goals=r.goals;if(r.assets)assets=r.assets;let profLoaded=false;if(r.profile&&Object.keys(r.profile).length){profile=Object.assign({name:'',ccy:'IDR',income:0,savingTarget:0,goal:'',gaji:25,saldo:0,invest:0},r.profile);profLoaded=true;if($('p-name'))$('p-name').value=profile.name||'';if($('p-income'))$('p-income').value=profile.income||'';if($('p-save'))$('p-save').value=profile.savingTarget||'';if($('p-saldo'))$('p-saldo').value=profile.saldo||'';if($('p-invest'))$('p-invest').value=profile.invest||'';if($('p-gaji'))$('p-gaji').value=profile.gaji||25;if($('p-goal'))$('p-goal').value=profile.goal||'';closeMo();}
-// Rekening hanya diupdate dari Sheets jika dipanggil manual (syncRekening=true)
-// Saat startup otomatis, rekening TIDAK ditimpa agar saldo lokal aman
 let rekMsg='';
-if(syncRekening&&r.rekening&&Object.keys(r.rekening).length){
-  const sheetsTotal=Object.values(r.rekening).reduce((s,v)=>s+(Number(v)||0),0);
-  if(sheetsTotal>0){
+if(syncRekening){
+  if(r.rekening&&Object.keys(r.rekening).length){
+    // Selalu update dari Sheets saat manual pull — Sheets adalah sumber kebenaran
     rekening=Object.assign({BNI:0,JAGO:0,BRI:0,MANDIRI:0,BCA:0,DANA:0,GOPAY:0,OVO:0,LINKAJA:0},r.rekening);
-    rekMsg=' | Saldo rekening: '+Object.entries(r.rekening).filter(([,v])=>Number(v)>0).map(([k,v])=>k+' '+fmt(Number(v))).join(', ');
+    save();renderRekening();
+    const nonZero=Object.entries(rekening).filter(([,v])=>v>0);
+    rekMsg=nonZero.length?(' | Rekening: '+nonZero.map(([k,v])=>k+' '+fmt(v)).join(', ')):'| Rekening: semua 0 dari Sheets';
   } else {
-    rekMsg=' | ⚠️ Rekening di Sheets masih 0 — input saldo di Computer B lalu Kirim dulu!';
+    rekMsg=' | r.rekening kosong/null dari GAS';
   }
 }if(Array.isArray(r.notes))notes=r.notes;save();const mf=$('trx-month-flt');if(mf)mf.value='';renderAll();setSync('ok','✅ Data terbaru');const trxCount=Array.isArray(r.transactions)?r.transactions.length:0;toast((profLoaded?'✅ Data & profil '+profile.name+' ('+trxCount+' transaksi)':'✅ '+trxCount+' transaksi dari Sheets')+rekMsg,5000);}catch(e){setSync('err','🔴 Pull gagal: '+e.message);renderAll();}}
 async function pushAll(){if(!GS_ON)return;setSync('busy','Mengirim...');try{await gasPost({action:'syncAll',transactions,budgets,debts,goals,assets,notes,profile,rekening});setSync('ok','✅ Terkirim — '+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}));toast('✅ Semua data terkirim ke Sheets!');}catch(e){setSync('err','🔴 Push gagal');toast('❌ '+e.message,3500);}}

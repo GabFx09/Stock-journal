@@ -1,12 +1,38 @@
 {
-  "tanggal": "2026-06-11",
-  "hari_ini_label": "Kamis, 11 Juni 2026",
-  "jam_update": "2026-06-11 07:02 WIB",
-  "total_event": 5,
-  "event_tinggi": 2,
-  "weekend_mode": false,
-  "catatan": "",
+  "tanggal": "2026-06-12",
+  "hari_ini_label": "Jumat, 12 Juni 2026",
+  "jam_update": "2026-06-12 07:02 WIB",
+  "total_event": 20,
+  "event_tinggi": 6,
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Prelim UoM Consumer Sentiment",
+      "event_id": "Sentimen Konsumen Michigan",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "46.1",
+      "sebelumnya": "48.2",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Prelim UoM Inflation Expectations",
+      "event_id": "Prelim UoM Inflation Expectations",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "4.5%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Core PPI m/m",
@@ -18,7 +44,7 @@
       "perkiraan": "0.5%",
       "sebelumnya": "1.0%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-11)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +57,7 @@
       "perkiraan": "0.7%",
       "sebelumnya": "1.4%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-11)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +70,7 @@
       "perkiraan": "220K",
       "sebelumnya": "225K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-11)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +83,7 @@
       "perkiraan": "101B",
       "sebelumnya": "95B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-11)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +96,176 @@
       "perkiraan": "—",
       "sebelumnya": "5.05|2.3",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-11)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core CPI m/m",
+      "event_id": "Indeks Harga Konsumen (CPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.3%",
+      "sebelumnya": "0.4%",
+      "dampak_saham": "CPI tinggi → Fed hawkish → pasar turun; CPI rendah → potensi rate cut → naik",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core CPI y/y",
+      "event_id": "Indeks Harga Konsumen (CPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "2.9%",
+      "sebelumnya": "2.8%",
+      "dampak_saham": "CPI tinggi → Fed hawkish → pasar turun; CPI rendah → potensi rate cut → naik",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "CPI m/m",
+      "event_id": "Indeks Harga Konsumen (CPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.5%",
+      "sebelumnya": "0.6%",
+      "dampak_saham": "CPI tinggi → Fed hawkish → pasar turun; CPI rendah → potensi rate cut → naik",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "CPI y/y",
+      "event_id": "Indeks Harga Konsumen (CPI)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "4.2%",
+      "sebelumnya": "3.8%",
+      "dampak_saham": "CPI tinggi → Fed hawkish → pasar turun; CPI rendah → potensi rate cut → naik",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-3.0M",
+      "sebelumnya": "-8.0M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "10-y Bond Auction",
+      "event_id": "10-y Bond Auction",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "4.47|2.4",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Federal Budget Balance",
+      "event_id": "Federal Budget Balance",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-282.9B",
+      "sebelumnya": "215.0B",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-10)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "NFIB Small Business Index",
+      "event_id": "NFIB Small Business Index",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "96.0",
+      "sebelumnya": "95.9",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-09)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "ADP Weekly Employment Change",
+      "event_id": "ADP Weekly Employment Change",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "35.8K",
+      "dampak_saham": "Prekursor NFP — ADP kuat → ekspektasi NFP tinggi → pasar naik",
+      "tanggal_label": "Ringkasan (2026-06-09)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Trade Balance",
+      "event_id": "Neraca Perdagangan AS",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-56.2B",
+      "sebelumnya": "-60.3B",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-09)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Existing Home Sales",
+      "event_id": "Penjualan Rumah Bekas",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "4.07M",
+      "sebelumnya": "4.02M",
+      "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
+      "tanggal_label": "Ringkasan (2026-06-09)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Final Wholesale Inventories m/m",
+      "event_id": "Inventori Pedagang Grosir",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.6%",
+      "sebelumnya": "0.5%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-09)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "API Weekly Statistical Bulletin",
+      "event_id": "API Weekly Statistical Bulletin",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-09)"
     }
   ]
 }

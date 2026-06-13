@@ -1,7 +1,7 @@
 {
-  "tanggal": "2026-06-12",
-  "hari_ini_label": "Jumat, 12 Juni 2026",
-  "jam_update": "2026-06-12 07:02 WIB",
+  "tanggal": "2026-06-13",
+  "hari_ini_label": "Sabtu, 13 Juni 2026",
+  "jam_update": "2026-06-13 07:03 WIB",
   "total_event": 20,
   "event_tinggi": 6,
   "weekend_mode": true,
@@ -18,7 +18,7 @@
       "perkiraan": "46.1",
       "sebelumnya": "48.2",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-12)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "—",
       "sebelumnya": "4.5%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-12)"
     },
     {
       "waktu": "— ET",

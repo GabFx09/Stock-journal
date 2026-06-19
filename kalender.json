@@ -1,12 +1,25 @@
 {
-  "tanggal": "2026-06-18",
-  "hari_ini_label": "Kamis, 18 Juni 2026",
-  "jam_update": "2026-06-18 07:03 WIB",
-  "total_event": 5,
-  "event_tinggi": 0,
-  "weekend_mode": false,
-  "catatan": "",
+  "tanggal": "2026-06-19",
+  "hari_ini_label": "Jumat, 19 Juni 2026",
+  "jam_update": "2026-06-19 07:02 WIB",
+  "total_event": 16,
+  "event_tinggi": 4,
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Bank Holiday",
+      "event_id": "Bank Holiday",
+      "dampak": "Rendah",
+      "dampak_en": "Holiday",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Philly Fed Manufacturing Index",
@@ -18,7 +31,7 @@
       "perkiraan": "9.8",
       "sebelumnya": "-0.4",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-18)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +44,7 @@
       "perkiraan": "225K",
       "sebelumnya": "229K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-18)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +57,7 @@
       "perkiraan": "0.1%",
       "sebelumnya": "0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-18)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +70,7 @@
       "perkiraan": "82B",
       "sebelumnya": "108B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-18)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +83,137 @@
       "perkiraan": "72.5B",
       "sebelumnya": "81.3B",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-06-18)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core Retail Sales m/m",
+      "event_id": "Penjualan Ritel",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.6%",
+      "sebelumnya": "0.7%",
+      "dampak_saham": "Penjualan retail kuat → konsumsi tinggi → positif saham consumer",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Retail Sales m/m",
+      "event_id": "Penjualan Ritel",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.5%",
+      "sebelumnya": "0.5%",
+      "dampak_saham": "Penjualan retail kuat → konsumsi tinggi → positif saham consumer",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Business Inventories m/m",
+      "event_id": "Inventori Bisnis",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.5%",
+      "sebelumnya": "0.9%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Pending Home Sales m/m",
+      "event_id": "Kontrak Rumah Tertunda",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.8%",
+      "sebelumnya": "1.4%",
+      "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-3.6M",
+      "sebelumnya": "-7.2M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "President Trump Speaks",
+      "event_id": "President Trump Speaks",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Federal Funds Rate",
+      "event_id": "Federal Funds Rate",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "3.75%",
+      "sebelumnya": "3.75%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Economic Projections",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Statement",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-06-17)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Press Conference",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-06-17)"
     }
   ]
 }

@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-06-22",
-  "hari_ini_label": "Senin, 22 Juni 2026",
-  "jam_update": "2026-06-22 07:02 WIB",
-  "total_event": 6,
+  "tanggal": "2026-06-23",
+  "hari_ini_label": "Selasa, 23 Juni 2026",
+  "jam_update": "2026-06-23 07:03 WIB",
+  "total_event": 5,
   "event_tinggi": 0,
-  "weekend_mode": true,
-  "catatan": "Hari ini (Senin) tidak ada event USD baru. Menampilkan event hari kerja berikutnya.",
+  "weekend_mode": false,
+  "catatan": "",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "FOMC Member Waller Speaks",
-      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "ADP Weekly Employment Change",
@@ -31,7 +18,7 @@
       "perkiraan": "—",
       "sebelumnya": "25.5K",
       "dampak_saham": "Prekursor NFP — ADP kuat → ekspektasi NFP tinggi → pasar naik",
-      "tanggal_label": "Besok (2026-06-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +31,7 @@
       "perkiraan": "54.6",
       "sebelumnya": "55.3",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Besok (2026-06-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -54,10 +41,10 @@
       "dampak_en": "Medium",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "51.0",
+      "perkiraan": "51.1",
       "sebelumnya": "50.9",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Besok (2026-06-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -70,7 +57,7 @@
       "perkiraan": "8",
       "sebelumnya": "13",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-06-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -83,7 +70,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-06-23)"
+      "tanggal_label": "Hari Ini"
     }
   ]
 }

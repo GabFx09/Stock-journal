@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-07-22",
-  "hari_ini_label": "Rabu, 22 Juli 2026",
-  "jam_update": "2026-07-22 07:02 WIB",
-  "total_event": 7,
+  "tanggal": "2026-07-23",
+  "hari_ini_label": "Kamis, 23 Juli 2026",
+  "jam_update": "2026-07-23 07:02 WIB",
+  "total_event": 8,
   "event_tinggi": 0,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "Crude Oil Inventories",
-      "event_id": "Stok Minyak Mentah AS (EIA)",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "-2.0M",
-      "sebelumnya": "-1.7M",
-      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "Unemployment Claims",
@@ -31,7 +18,7 @@
       "perkiraan": "211K",
       "sebelumnya": "208K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Besok (2026-07-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +31,7 @@
       "perkiraan": "29B",
       "sebelumnya": "41B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Besok (2026-07-23)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -57,7 +44,33 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Imbal hasil naik → saham growth tertekan; turun → saham teknologi naik",
-      "tanggal_label": "Besok (2026-07-23)"
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-2.0M",
+      "sebelumnya": "-1.7M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-07-22)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "President Trump Speaks",
+      "event_id": "President Trump Speaks",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-07-22)"
     },
     {
       "waktu": "— ET",

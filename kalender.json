@@ -1,12 +1,51 @@
 {
-  "tanggal": "2026-07-23",
-  "hari_ini_label": "Kamis, 23 Juli 2026",
-  "jam_update": "2026-07-23 07:02 WIB",
-  "total_event": 8,
+  "tanggal": "2026-07-24",
+  "hari_ini_label": "Jumat, 24 Juli 2026",
+  "jam_update": "2026-07-24 07:02 WIB",
+  "total_event": 11,
   "event_tinggi": 0,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Flash Manufacturing PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "54.4",
+      "sebelumnya": "55.7",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Flash Services PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "51.3",
+      "sebelumnya": "51.3",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "New Home Sales",
+      "event_id": "Penjualan Rumah Baru",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "609K",
+      "sebelumnya": "580K",
+      "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Unemployment Claims",
@@ -18,7 +57,7 @@
       "perkiraan": "211K",
       "sebelumnya": "208K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-23)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +70,7 @@
       "perkiraan": "29B",
       "sebelumnya": "41B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-23)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +83,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Imbal hasil naik → saham growth tertekan; turun → saham teknologi naik",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-23)"
     },
     {
       "waktu": "— ET",

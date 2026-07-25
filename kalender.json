@@ -1,8 +1,8 @@
 {
-  "tanggal": "2026-07-24",
-  "hari_ini_label": "Jumat, 24 Juli 2026",
-  "jam_update": "2026-07-24 07:02 WIB",
-  "total_event": 11,
+  "tanggal": "2026-07-25",
+  "hari_ini_label": "Sabtu, 25 Juli 2026",
+  "jam_update": "2026-07-25 07:01 WIB",
+  "total_event": 12,
   "event_tinggi": 0,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
@@ -18,7 +18,7 @@
       "perkiraan": "54.4",
       "sebelumnya": "55.7",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-24)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "51.3",
       "sebelumnya": "51.3",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-24)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,20 @@
       "perkiraan": "609K",
       "sebelumnya": "580K",
       "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-07-24)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "President Trump Speaks",
+      "event_id": "President Trump Speaks",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-07-24)"
     },
     {
       "waktu": "— ET",

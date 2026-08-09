@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-08-08",
-  "hari_ini_label": "Sabtu, 8 Agustus 2026",
-  "jam_update": "2026-08-08 07:01 WIB",
-  "total_event": 20,
+  "tanggal": "2026-08-09",
+  "hari_ini_label": "Minggu, 9 Agustus 2026",
+  "jam_update": "2026-08-09 07:01 WIB",
+  "total_event": 19,
   "event_tinggi": 3,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "FOMC Member Bowman Speaks",
-      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "Average Hourly Earnings m/m",

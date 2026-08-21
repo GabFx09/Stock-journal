@@ -1,12 +1,38 @@
 {
-  "tanggal": "2026-08-20",
-  "hari_ini_label": "Kamis, 20 Agustus 2026",
-  "jam_update": "2026-08-20 07:01 WIB",
+  "tanggal": "2026-08-21",
+  "hari_ini_label": "Jumat, 21 Agustus 2026",
+  "jam_update": "2026-08-21 07:01 WIB",
   "total_event": 18,
   "event_tinggi": 1,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Flash Manufacturing PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "53.9",
+      "sebelumnya": "53.8",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Flash Services PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "54.0",
+      "sebelumnya": "53.6",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Philly Fed Manufacturing Index",
@@ -18,7 +44,7 @@
       "perkiraan": "24.1",
       "sebelumnya": "41.4",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-20)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +57,7 @@
       "perkiraan": "210K",
       "sebelumnya": "209K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-20)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +70,7 @@
       "perkiraan": "0.1%",
       "sebelumnya": "-0.2%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-20)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +83,20 @@
       "perkiraan": "15B",
       "sebelumnya": "36B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-20)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Musalem Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-08-20)"
     },
     {
       "waktu": "— ET",
@@ -201,45 +240,6 @@
       "sebelumnya": "—",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
       "tanggal_label": "Ringkasan (2026-08-18)"
-    },
-    {
-      "waktu": "— ET",
-      "event": "Empire State Manufacturing Index",
-      "event_id": "Indeks Manufaktur Empire State",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "10.6",
-      "sebelumnya": "15.6",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Ringkasan (2026-08-17)"
-    },
-    {
-      "waktu": "— ET",
-      "event": "NAHB Housing Market Index",
-      "event_id": "NAHB Housing Market Index",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "33",
-      "sebelumnya": "34",
-      "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
-      "tanggal_label": "Ringkasan (2026-08-17)"
-    },
-    {
-      "waktu": "— ET",
-      "event": "TIC Long-Term Purchases",
-      "event_id": "TIC Long-Term Purchases",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "151.4B",
-      "sebelumnya": "232.7B",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Ringkasan (2026-08-17)"
     }
   ]
 }

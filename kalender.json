@@ -1,8 +1,8 @@
 {
-  "tanggal": "2026-08-21",
-  "hari_ini_label": "Jumat, 21 Agustus 2026",
-  "jam_update": "2026-08-21 07:01 WIB",
-  "total_event": 18,
+  "tanggal": "2026-08-22",
+  "hari_ini_label": "Sabtu, 22 Agustus 2026",
+  "jam_update": "2026-08-22 07:01 WIB",
+  "total_event": 19,
   "event_tinggi": 1,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
@@ -18,7 +18,7 @@
       "perkiraan": "53.9",
       "sebelumnya": "53.8",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-21)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,20 @@
       "perkiraan": "54.0",
       "sebelumnya": "53.6",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-21)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "President Trump Speaks",
+      "event_id": "President Trump Speaks",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-21)"
     },
     {
       "waktu": "— ET",

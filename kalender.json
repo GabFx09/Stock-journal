@@ -1,12 +1,64 @@
 {
-  "tanggal": "2026-08-26",
-  "hari_ini_label": "Rabu, 26 Agustus 2026",
-  "jam_update": "2026-08-26 07:03 WIB",
-  "total_event": 9,
+  "tanggal": "2026-08-27",
+  "hari_ini_label": "Kamis, 27 Agustus 2026",
+  "jam_update": "2026-08-27 07:03 WIB",
+  "total_event": 22,
   "event_tinggi": 2,
-  "weekend_mode": false,
-  "catatan": "",
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Unemployment Claims",
+      "event_id": "Unemployment Claims",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "208K",
+      "sebelumnya": "206K",
+      "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Goods Trade Balance",
+      "event_id": "Neraca Perdagangan AS",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-100.8B",
+      "sebelumnya": "-101.5B",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Prelim Wholesale Inventories m/m",
+      "event_id": "Inventori Pedagang Grosir",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.2%",
+      "sebelumnya": "0.2%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Natural Gas Storage",
+      "event_id": "Penyimpanan Gas Alam",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "19B",
+      "sebelumnya": "16B",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Core PCE Price Index m/m",
@@ -18,7 +70,7 @@
       "perkiraan": "0.2%",
       "sebelumnya": "0.1%",
       "dampak_saham": "PCE adalah inflasi favorit Fed — tinggi berarti hawkish → negatif pasar",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +83,7 @@
       "perkiraan": "1.5%",
       "sebelumnya": "1.5%",
       "dampak_saham": "GDP kuat → ekonomi sehat → positif; GDP lemah → kekhawatiran resesi → negatif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +96,7 @@
       "perkiraan": "6.2%",
       "sebelumnya": "6.2%",
       "dampak_saham": "GDP kuat → ekonomi sehat → positif; GDP lemah → kekhawatiran resesi → negatif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +109,7 @@
       "perkiraan": "0.6%",
       "sebelumnya": "0.6%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +122,7 @@
       "perkiraan": "0.4%",
       "sebelumnya": "0.3%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -83,7 +135,7 @@
       "perkiraan": "0.2%",
       "sebelumnya": "0.2%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -96,7 +148,7 @@
       "perkiraan": "0.1%",
       "sebelumnya": "0.3%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -109,7 +161,7 @@
       "perkiraan": "1.6M",
       "sebelumnya": "4.4M",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
     },
     {
       "waktu": "— ET",
@@ -122,7 +174,124 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "ADP Weekly Employment Change",
+      "event_id": "ADP Weekly Employment Change",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "9.5K",
+      "dampak_saham": "Prekursor NFP — ADP kuat → ekspektasi NFP tinggi → pasar naik",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Barkin Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "HPI m/m",
+      "event_id": "HPI m/m",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.2%",
+      "sebelumnya": "0.3%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "S&P/CS Composite-20 HPI y/y",
+      "event_id": "S&P/CS Composite-20 HPI y/y",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "1.8%",
+      "sebelumnya": "1.6%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "CB Consumer Confidence",
+      "event_id": "Indeks Kepercayaan Konsumen",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "90.3",
+      "sebelumnya": "90.8",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "New Home Sales",
+      "event_id": "Penjualan Rumah Baru",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "620K",
+      "sebelumnya": "628K",
+      "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Richmond Manufacturing Index",
+      "event_id": "Richmond Manufacturing Index",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "6",
+      "sebelumnya": "5",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Barkin Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-08-25)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "API Weekly Statistical Bulletin",
+      "event_id": "API Weekly Statistical Bulletin",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-25)"
     }
   ]
 }

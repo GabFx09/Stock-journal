@@ -1,11 +1,11 @@
 {
-  "tanggal": "2026-08-28",
-  "hari_ini_label": "Jumat, 28 Agustus 2026",
-  "jam_update": "2026-08-28 07:02 WIB",
-  "total_event": 6,
-  "event_tinggi": 2,
-  "weekend_mode": false,
-  "catatan": "",
+  "tanggal": "2026-08-29",
+  "hari_ini_label": "Sabtu, 29 Agustus 2026",
+  "jam_update": "2026-08-29 07:03 WIB",
+  "total_event": 19,
+  "event_tinggi": 4,
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
     {
       "waktu": "— ET",
@@ -18,7 +18,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "57.9",
       "sebelumnya": "57.6",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Nada dovish → pasar naik; nada hawkish → pasar turun",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +57,7 @@
       "perkiraan": "—",
       "sebelumnya": "-911K",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +70,7 @@
       "perkiraan": "51.0",
       "sebelumnya": "51.0",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
     },
     {
       "waktu": "— ET",
@@ -83,7 +83,176 @@
       "perkiraan": "—",
       "sebelumnya": "4.3%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-08-28)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Unemployment Claims",
+      "event_id": "Unemployment Claims",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "208K",
+      "sebelumnya": "206K",
+      "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
+      "tanggal_label": "Ringkasan (2026-08-27)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Goods Trade Balance",
+      "event_id": "Neraca Perdagangan AS",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-100.8B",
+      "sebelumnya": "-101.5B",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-27)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Prelim Wholesale Inventories m/m",
+      "event_id": "Inventori Pedagang Grosir",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.2%",
+      "sebelumnya": "0.2%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-27)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Natural Gas Storage",
+      "event_id": "Penyimpanan Gas Alam",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "19B",
+      "sebelumnya": "16B",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-08-27)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core PCE Price Index m/m",
+      "event_id": "Indeks Harga PCE (Inflasi Favorit Fed)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.2%",
+      "sebelumnya": "0.1%",
+      "dampak_saham": "PCE adalah inflasi favorit Fed — tinggi berarti hawkish → negatif pasar",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Prelim GDP q/q",
+      "event_id": "Produk Domestik Bruto (PDB)",
+      "dampak": "Tinggi",
+      "dampak_en": "High",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "1.5%",
+      "sebelumnya": "1.5%",
+      "dampak_saham": "GDP kuat → ekonomi sehat → positif; GDP lemah → kekhawatiran resesi → negatif",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Prelim GDP Price Index q/q",
+      "event_id": "Produk Domestik Bruto (PDB)",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "6.2%",
+      "sebelumnya": "6.2%",
+      "dampak_saham": "GDP kuat → ekonomi sehat → positif; GDP lemah → kekhawatiran resesi → negatif",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Core Durable Goods Orders m/m",
+      "event_id": "Pesanan Barang Tahan Lama",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.6%",
+      "sebelumnya": "0.6%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Durable Goods Orders m/m",
+      "event_id": "Pesanan Barang Tahan Lama",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.4%",
+      "sebelumnya": "0.3%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Personal Income m/m",
+      "event_id": "Pendapatan Pribadi",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.2%",
+      "sebelumnya": "0.2%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Personal Spending m/m",
+      "event_id": "Pengeluaran Pribadi",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.1%",
+      "sebelumnya": "0.3%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "1.6M",
+      "sebelumnya": "4.4M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-08-26)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "FOMC Member Barkin Speaks",
+      "event_id": "Keputusan FOMC — Kebijakan Moneter Fed",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
+      "tanggal_label": "Ringkasan (2026-08-26)"
     }
   ]
 }

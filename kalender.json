@@ -1,11 +1,11 @@
 {
-  "tanggal": "2026-08-31",
-  "hari_ini_label": "Senin, 31 Agustus 2026",
-  "jam_update": "2026-08-31 07:03 WIB",
+  "tanggal": "2026-09-01",
+  "hari_ini_label": "Selasa, 1 September 2026",
+  "jam_update": "2026-09-01 07:03 WIB",
   "total_event": 9,
   "event_tinggi": 1,
-  "weekend_mode": true,
-  "catatan": "Hari ini (Senin) tidak ada event USD baru. Menampilkan event hari kerja berikutnya.",
+  "weekend_mode": false,
+  "catatan": "",
   "hari_ini": [
     {
       "waktu": "— ET",
@@ -18,7 +18,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "53.3",
       "sebelumnya": "53.2",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "55.2",
       "sebelumnya": "55.6",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -54,10 +54,10 @@
       "dampak_en": "Medium",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "71.2",
+      "perkiraan": "70.5",
       "sebelumnya": "71.1",
       "dampak_saham": "ISM tinggi → manufaktur/jasa kuat → positif ekonomi AS",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -70,7 +70,7 @@
       "perkiraan": "7.33M",
       "sebelumnya": "7.36M",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -83,7 +83,7 @@
       "perkiraan": "0.0%",
       "sebelumnya": "-0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -96,7 +96,7 @@
       "perkiraan": "46.2",
       "sebelumnya": "45.1",
       "dampak_saham": "ISM tinggi → manufaktur/jasa kuat → positif ekonomi AS",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -109,7 +109,7 @@
       "perkiraan": "16.3M",
       "sebelumnya": "16.3M",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -122,7 +122,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-09-01)"
+      "tanggal_label": "Hari Ini"
     }
   ]
 }

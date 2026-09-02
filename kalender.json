@@ -1,12 +1,64 @@
 {
-  "tanggal": "2026-09-01",
-  "hari_ini_label": "Selasa, 1 September 2026",
-  "jam_update": "2026-09-01 07:03 WIB",
-  "total_event": 9,
+  "tanggal": "2026-09-02",
+  "hari_ini_label": "Rabu, 2 September 2026",
+  "jam_update": "2026-09-02 07:02 WIB",
+  "total_event": 13,
   "event_tinggi": 1,
-  "weekend_mode": false,
-  "catatan": "",
+  "weekend_mode": true,
+  "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "ADP Non-Farm Employment Change",
+      "event_id": "Penggajian Non-Pertanian ADP",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "47K",
+      "sebelumnya": "44K",
+      "dampak_saham": "Di atas ekspektasi → S&P naik; Di bawah → S&P turun",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Factory Orders m/m",
+      "event_id": "Pesanan Pabrik",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "0.7%",
+      "sebelumnya": "-0.3%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-0.4M",
+      "sebelumnya": "0.1M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Beige Book",
+      "event_id": "Buku Beige Federal Reserve",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "FOMC Member Barr Speaks",
@@ -18,7 +70,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +83,7 @@
       "perkiraan": "53.3",
       "sebelumnya": "53.2",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +96,7 @@
       "perkiraan": "55.2",
       "sebelumnya": "55.6",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +109,7 @@
       "perkiraan": "70.5",
       "sebelumnya": "71.1",
       "dampak_saham": "ISM tinggi → manufaktur/jasa kuat → positif ekonomi AS",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -70,7 +122,7 @@
       "perkiraan": "7.33M",
       "sebelumnya": "7.36M",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -83,7 +135,7 @@
       "perkiraan": "0.0%",
       "sebelumnya": "-0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -96,7 +148,7 @@
       "perkiraan": "46.2",
       "sebelumnya": "45.1",
       "dampak_saham": "ISM tinggi → manufaktur/jasa kuat → positif ekonomi AS",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -109,7 +161,7 @@
       "perkiraan": "16.3M",
       "sebelumnya": "16.3M",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     },
     {
       "waktu": "— ET",
@@ -122,7 +174,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-01)"
     }
   ]
 }

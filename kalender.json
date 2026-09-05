@@ -1,7 +1,7 @@
 {
-  "tanggal": "2026-09-04",
-  "hari_ini_label": "Jumat, 4 September 2026",
-  "jam_update": "2026-09-04 07:03 WIB",
+  "tanggal": "2026-09-05",
+  "hari_ini_label": "Sabtu, 5 September 2026",
+  "jam_update": "2026-09-05 07:03 WIB",
   "total_event": 18,
   "event_tinggi": 3,
   "weekend_mode": true,
@@ -18,7 +18,7 @@
       "perkiraan": "0.3%",
       "sebelumnya": "0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-04)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "55K",
       "sebelumnya": "-23K",
       "dampak_saham": "Di atas ekspektasi → S&P naik; Di bawah → S&P turun",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-04)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "4.1%",
       "sebelumnya": "4.1%",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-09-04)"
     },
     {
       "waktu": "— ET",

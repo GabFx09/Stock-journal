@@ -1,0 +1,50 @@
+{
+  "tanggal": "2026-09-07",
+  "hari_ini_label": "Senin, 7 September 2026",
+  "jam_update": "2026-09-07 07:03 WIB",
+  "total_event": 3,
+  "event_tinggi": 0,
+  "weekend_mode": true,
+  "catatan": "Hari ini (Senin) tidak ada event USD baru. Menampilkan event hari kerja berikutnya.",
+  "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Bank Holiday",
+      "event_id": "Bank Holiday",
+      "dampak": "Rendah",
+      "dampak_en": "Holiday",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "NFIB Small Business Index",
+      "event_id": "NFIB Small Business Index",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "99.2",
+      "sebelumnya": "99.8",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Besok (2026-09-08)"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Consumer Credit m/m",
+      "event_id": "Consumer Credit m/m",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "13.2B",
+      "sebelumnya": "14.2B",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Besok (2026-09-08)"
+    }
+  ]
+}

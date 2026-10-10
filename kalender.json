@@ -1,8 +1,8 @@
 {
-  "tanggal": "2026-10-09",
-  "hari_ini_label": "Jumat, 9 Oktober 2026",
-  "jam_update": "2026-10-09 07:02 WIB",
-  "total_event": 21,
+  "tanggal": "2026-10-10",
+  "hari_ini_label": "Sabtu, 10 Oktober 2026",
+  "jam_update": "2026-10-10 07:02 WIB",
+  "total_event": 20,
   "event_tinggi": 1,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
@@ -18,7 +18,7 @@
       "perkiraan": "47.5",
       "sebelumnya": "47.8",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-09)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "—",
       "sebelumnya": "4.6%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-09)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-09)"
     },
     {
       "waktu": "— ET",
@@ -265,19 +265,6 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Ringkasan (2026-10-06)"
-    },
-    {
-      "waktu": "— ET",
-      "event": "API Weekly Statistical Bulletin",
-      "event_id": "API Weekly Statistical Bulletin",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
       "tanggal_label": "Ringkasan (2026-10-06)"
     }
   ]

@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-10-21",
-  "hari_ini_label": "Rabu, 21 Oktober 2026",
-  "jam_update": "2026-10-21 07:02 WIB",
+  "tanggal": "2026-10-22",
+  "hari_ini_label": "Kamis, 22 Oktober 2026",
+  "jam_update": "2026-10-22 07:02 WIB",
   "total_event": 10,
   "event_tinggi": 0,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "Crude Oil Inventories",
-      "event_id": "Stok Minyak Mentah AS (EIA)",
-      "dampak": "Rendah",
-      "dampak_en": "Low",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "-0.1M",
-      "sebelumnya": "-8.6M",
-      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "Unemployment Claims",
@@ -31,7 +18,7 @@
       "perkiraan": "200K",
       "sebelumnya": "199K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Besok (2026-10-22)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +31,7 @@
       "perkiraan": "-0.1%",
       "sebelumnya": "-0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-10-22)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -54,10 +41,23 @@
       "dampak_en": "Low",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "83B",
+      "perkiraan": "80B",
       "sebelumnya": "67B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Besok (2026-10-22)"
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Crude Oil Inventories",
+      "event_id": "Stok Minyak Mentah AS (EIA)",
+      "dampak": "Rendah",
+      "dampak_en": "Low",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "-0.1M",
+      "sebelumnya": "-8.6M",
+      "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
+      "tanggal_label": "Ringkasan (2026-10-21)"
     },
     {
       "waktu": "— ET",

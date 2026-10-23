@@ -1,12 +1,64 @@
 {
-  "tanggal": "2026-10-22",
-  "hari_ini_label": "Kamis, 22 Oktober 2026",
-  "jam_update": "2026-10-22 07:02 WIB",
-  "total_event": 10,
+  "tanggal": "2026-10-23",
+  "hari_ini_label": "Jumat, 23 Oktober 2026",
+  "jam_update": "2026-10-23 07:02 WIB",
+  "total_event": 14,
   "event_tinggi": 0,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
+    {
+      "waktu": "— ET",
+      "event": "Flash Manufacturing PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "55.4",
+      "sebelumnya": "57.0",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Flash Services PMI",
+      "event_id": "Indeks Manajer Pembelian (PMI)",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "57.9",
+      "sebelumnya": "58.7",
+      "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Revised UoM Consumer Sentiment",
+      "event_id": "Sentimen Konsumen Michigan",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "46.3",
+      "sebelumnya": "46.3",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Revised UoM Inflation Expectations",
+      "event_id": "Revised UoM Inflation Expectations",
+      "dampak": "Sedang",
+      "dampak_en": "Medium",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "4.7%",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Hari Ini"
+    },
     {
       "waktu": "— ET",
       "event": "Unemployment Claims",
@@ -18,7 +70,7 @@
       "perkiraan": "200K",
       "sebelumnya": "199K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-22)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +83,7 @@
       "perkiraan": "-0.1%",
       "sebelumnya": "-0.1%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-22)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +96,7 @@
       "perkiraan": "80B",
       "sebelumnya": "67B",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-22)"
     },
     {
       "waktu": "— ET",

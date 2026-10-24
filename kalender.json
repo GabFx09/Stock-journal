@@ -1,7 +1,7 @@
 {
-  "tanggal": "2026-10-23",
-  "hari_ini_label": "Jumat, 23 Oktober 2026",
-  "jam_update": "2026-10-23 07:02 WIB",
+  "tanggal": "2026-10-24",
+  "hari_ini_label": "Sabtu, 24 Oktober 2026",
+  "jam_update": "2026-10-24 07:02 WIB",
   "total_event": 14,
   "event_tinggi": 0,
   "weekend_mode": true,
@@ -18,7 +18,7 @@
       "perkiraan": "55.4",
       "sebelumnya": "57.0",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-23)"
     },
     {
       "waktu": "— ET",
@@ -31,7 +31,7 @@
       "perkiraan": "57.9",
       "sebelumnya": "58.7",
       "dampak_saham": "PMI > 50 = ekspansi (bullish); PMI < 50 = kontraksi (bearish)",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-23)"
     },
     {
       "waktu": "— ET",
@@ -44,7 +44,7 @@
       "perkiraan": "46.3",
       "sebelumnya": "46.3",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-23)"
     },
     {
       "waktu": "— ET",
@@ -57,7 +57,7 @@
       "perkiraan": "—",
       "sebelumnya": "4.7%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
+      "tanggal_label": "Ringkasan (2026-10-23)"
     },
     {
       "waktu": "— ET",

@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-11-11",
-  "hari_ini_label": "Rabu, 11 November 2026",
-  "jam_update": "2026-11-11 07:03 WIB",
-  "total_event": 13,
+  "tanggal": "2026-11-12",
+  "hari_ini_label": "Kamis, 12 November 2026",
+  "jam_update": "2026-11-12 07:03 WIB",
+  "total_event": 12,
   "event_tinggi": 0,
-  "weekend_mode": true,
-  "catatan": "Hari ini (Rabu) tidak ada event USD baru. Menampilkan event hari kerja berikutnya.",
+  "weekend_mode": false,
+  "catatan": "",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "Bank Holiday",
-      "event_id": "Bank Holiday",
-      "dampak": "Rendah",
-      "dampak_en": "Holiday",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "Unemployment Claims",
@@ -31,7 +18,7 @@
       "perkiraan": "194K",
       "sebelumnya": "189K",
       "dampak_saham": "Pengangguran naik → pasar khawatir; Pengangguran turun → ekonomi sehat",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +31,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -57,7 +44,7 @@
       "perkiraan": "3.89M",
       "sebelumnya": "3.99M",
       "dampak_saham": "Data perumahan kuat → ekonomi sehat; lemah → tekanan konsumen",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -70,7 +57,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -83,7 +70,7 @@
       "perkiraan": "—",
       "sebelumnya": "4.37%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -96,7 +83,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -106,10 +93,10 @@
       "dampak_en": "Low",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "—",
+      "perkiraan": "-0.6M",
       "sebelumnya": "-0.9M",
       "dampak_saham": "Stok naik → harga energi turun → positif sektor konsumer",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -122,7 +109,7 @@
       "perkiraan": "—",
       "sebelumnya": "5.62|2.5",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -135,7 +122,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -148,7 +135,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -158,10 +145,10 @@
       "dampak_en": "Low",
       "mata_uang": "USD",
       "aktual": "—",
-      "perkiraan": "-286.3B",
+      "perkiraan": "-298.6B",
       "sebelumnya": "-26.9B",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -174,7 +161,7 @@
       "perkiraan": "—",
       "sebelumnya": "—",
       "dampak_saham": "Rate hike → negatif saham; Rate cut / dovish → sangat positif",
-      "tanggal_label": "Besok (2026-11-12)"
+      "tanggal_label": "Hari Ini"
     }
   ]
 }

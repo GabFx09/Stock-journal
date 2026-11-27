@@ -1,25 +1,12 @@
 {
-  "tanggal": "2026-11-26",
-  "hari_ini_label": "Kamis, 26 November 2026",
-  "jam_update": "2026-11-26 07:03 WIB",
+  "tanggal": "2026-11-27",
+  "hari_ini_label": "Jumat, 27 November 2026",
+  "jam_update": "2026-11-27 07:02 WIB",
   "total_event": 22,
   "event_tinggi": 2,
   "weekend_mode": true,
   "catatan": "Hari ini adalah akhir pekan — pasar tutup. Menampilkan ringkasan kalender ekonomi minggu lalu. Data minggu depan akan tersedia Senin pagi.",
   "hari_ini": [
-    {
-      "waktu": "— ET",
-      "event": "Bank Holiday",
-      "event_id": "Bank Holiday",
-      "dampak": "Rendah",
-      "dampak_en": "Holiday",
-      "mata_uang": "USD",
-      "aktual": "—",
-      "perkiraan": "—",
-      "sebelumnya": "—",
-      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Hari Ini"
-    },
     {
       "waktu": "— ET",
       "event": "Goods Trade Balance",
@@ -31,7 +18,7 @@
       "perkiraan": "-135.9B",
       "sebelumnya": "-134.9B",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-11-27)"
+      "tanggal_label": "Hari Ini"
     },
     {
       "waktu": "— ET",
@@ -44,7 +31,20 @@
       "perkiraan": "0.5%",
       "sebelumnya": "0.6%",
       "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
-      "tanggal_label": "Besok (2026-11-27)"
+      "tanggal_label": "Hari Ini"
+    },
+    {
+      "waktu": "— ET",
+      "event": "Bank Holiday",
+      "event_id": "Bank Holiday",
+      "dampak": "Rendah",
+      "dampak_en": "Holiday",
+      "mata_uang": "USD",
+      "aktual": "—",
+      "perkiraan": "—",
+      "sebelumnya": "—",
+      "dampak_saham": "Pantau reaksi pasar — volatilitas mungkin terjadi",
+      "tanggal_label": "Ringkasan (2026-11-26)"
     },
     {
       "waktu": "— ET",
